@@ -1,3 +1,4 @@
+import Brand from "./Brand";
 import React, { useEffect, useState } from "react";
 import "./admin.css";
 const sections = {
@@ -65,7 +66,7 @@ export default function Admin({ request, profile, onAccessChanged }) {
     <main className="admin-shell">
       <header className="admin-header">
         <a className="brand" href="#">
-          Shypit
+          <Brand />
         </a>
         <span className="admin-badge">
           ADMIN · {profile.owner ? "OWNER" : "LIMITED ACCESS"}

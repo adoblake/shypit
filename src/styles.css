@@ -10,6 +10,12 @@
   --teal: #087f78;
   --line: #dedfdf;
   --muted: #5b6471;
+  --navy: #101d32;
+  --mint: #18b5a5;
+  --warm-white: #faf9f6;
+  --pale-teal: #e7f3f0;
+  --radius-button: 10px;
+  --radius-card: 22px;
 }
 * {
   box-sizing: border-box;
@@ -1384,4 +1390,73 @@ dialog[open] {
 .account-availability .text-button {
   margin: 8px 0 0;
   padding-left: 0;
+}
+
+/* Brand kit v1.2: outlined lockups retain their original proportions. */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.brand-lockup {
+  display: block;
+  width: 180px;
+  height: auto;
+}
+.topbar .brand-lockup {
+  width: 155px;
+}
+.auth-story {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.auth-story::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 380px;
+  height: 180px;
+  right: -70px;
+  bottom: 80px;
+  background: url("/brand/route-graphic.svg") center / contain no-repeat;
+  opacity: 0.13;
+  pointer-events: none;
+}
+.auth-story .eyebrow {
+  color: var(--mint);
+}
+.primary,
+.small-button,
+.filters input,
+.filters select,
+.password-input,
+.workspace-choice {
+  border-radius: var(--radius-button);
+}
+.membership,
+.job,
+.billing-plan,
+.empty,
+.modal {
+  border-radius: var(--radius-card);
+}
+.session-strip {
+  background: var(--pale-teal);
+}
+@media (max-width: 700px) {
+  .role {
+    max-width: calc(100% - 175px);
+  }
+  .auth-story::after {
+    width: 220px;
+    bottom: 0;
+    opacity: 0.08;
+  }
+}
+footer {
+  flex-wrap: wrap;
+}
+footer .brand-lockup {
+  width: 150px;
 }

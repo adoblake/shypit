@@ -1,3 +1,4 @@
+import Brand from "./Brand";
 import Admin from "./Admin";
 import React, {
   createContext,
@@ -608,7 +609,7 @@ export function AuthGate({ children }) {
     <main className="auth-page">
       <section className="auth-story">
         <a href="#" className="brand">
-          Shypit
+          <Brand light />
         </a>
         <div>
           <p className="eyebrow">YOUR PEOPLE. YOUR FREIGHT.</p>

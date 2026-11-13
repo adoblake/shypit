@@ -17,8 +17,8 @@
 .admin-badge {
   font-size: 11px;
   letter-spacing: 0.08em;
-  background: #e2efeb;
-  color: #17675f;
+  background: var(--pale-teal);
+  color: var(--teal);
   padding: 8px 12px;
   border-radius: 30px;
 }
@@ -39,7 +39,7 @@
   white-space: nowrap;
 }
 .admin-tabs button[aria-current] {
-  background: #237e76;
+  background: var(--teal);
   color: white;
 }
 .admin-shell button {
@@ -73,7 +73,7 @@
 .admin-metrics strong {
   display: block;
   font-size: 36px;
-  color: #15263d;
+  color: var(--navy);
   margin-top: 12px;
 }
 .admin-card {
@@ -124,7 +124,7 @@
 .admin-check input {
   width: 18px;
   height: 18px;
-  accent-color: #237e76;
+  accent-color: var(--teal);
 }
 .admin-confirm {
   background: #edf4f1;
@@ -144,11 +144,11 @@
   margin: 24px 0;
 }
 .admin-links a {
-  color: #17675f;
+  color: var(--teal);
   font-weight: 600;
 }
 .admin-shell :focus-visible {
-  outline: 3px solid #237e76;
+  outline: 3px solid var(--teal);
   outline-offset: 3px;
 }
 @media (max-width: 760px) {
@@ -179,7 +179,7 @@
   }
 }
 .admin-header .brand {
-  color: #15263d;
+  color: var(--navy);
 }
 .admin-records {
   display: grid;
@@ -197,5 +197,13 @@
 }
 .admin-record > span {
   font-size: 13px;
-  color: #17675f;
+  color: var(--teal);
+}
+
+.admin-metrics article,
+.admin-card {
+  border-radius: var(--radius-card);
+}
+.admin-shell button {
+  border-radius: var(--radius-button);
 }

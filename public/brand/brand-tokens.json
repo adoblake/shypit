@@ -1,0 +1,19 @@
+{
+  "color": {
+    "navy": "#101D32",
+    "teal": "#087F78",
+    "mint": "#18B5A5",
+    "warmWhite": "#FAF9F6",
+    "paleTeal": "#E7F3F0",
+    "slate": "#5B6471"
+  },
+  "font": {
+    "family": "DM Sans",
+    "heading": 700,
+    "body": 400
+  },
+  "radius": {
+    "button": 10,
+    "card": 22
+  }
+}

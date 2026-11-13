@@ -1,3 +1,4 @@
+import Brand from "./Brand";
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -192,7 +193,7 @@ function App({ account, initialData }) {
             setPage(tabs[0]);
           }}
         >
-          Shypit
+          <Brand light />
         </a>
         <nav aria-label="Main navigation">
           {tabs.map((t) => (
@@ -774,7 +775,7 @@ function App({ account, initialData }) {
         </main>
       )}
       <footer>
-        Shypit <span>Better together. Mile after mile.</span>
+        <Brand /> <span>Better together. Mile after mile.</span>
         <span>Private workspace</span>
       </footer>
       {modal && (
