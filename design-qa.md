@@ -28,3 +28,7 @@ The mockup's typography and table labels are larger than the working dense deskt
 ## Limits
 
 This is a browser-verified frontend foundation, not a live logistics service. No production backend, account authorization, verification, payments, GPS tracking, or actual dispatch has been validated. GitHub-hosted workflow execution and Pages deployment were not verified because GitHub API access is blocked in this environment.
+
+## Deployment follow-up
+
+Reproduced failure serving a non-Actions build at `/shypit/` with root-absolute asset paths. Changed Vite to relative asset paths. The production smoke test now verifies rendered business booking and driver acceptance at 1440px and 390px, with no failed HTTP assets or uncaught runtime errors. Both passed locally. This confirms the reproduced asset-path case is fixed; the live Pages cause remains unconfirmed while network access is blocked. The Pages workflow now also runs on foundation-branch pushes and gates deployment on the production smoke test.

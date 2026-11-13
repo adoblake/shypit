@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:production": "node scripts/check-production.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",

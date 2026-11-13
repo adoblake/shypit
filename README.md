@@ -21,6 +21,8 @@ npm run build
 ```sh
 npx playwright install chromium
 npm test
+npm run build
+npm run test:production
 ```
 
 Local tests use `/usr/bin/chromium`. On a different machine, set `CI=1` to use Playwright's installed browser. Checks cover desktop (1440px) and mobile (390px), shipment validation/booking, persistent demo data, load search, job acceptance, pickup, delivery proof, earnings, navigation, and horizontal overflow.
@@ -35,7 +37,7 @@ Local tests use `/usr/bin/chromium`. On a different machine, set `CI=1` to use P
 
 The `Build and browser checks` workflow builds and tests pushes, and uploads a `shypit-review` artifact containing the built site and desktop/mobile screenshots.
 
-For a review website, enable **Settings → Pages → Source: GitHub Actions**, then run **Publish review site** on the branch containing this code. This manual workflow deploys the demo, not a production transportation service. No live deployment is performed by local setup. Vite uses `/shypit/` as the GitHub Actions base path.
+For a review website, enable **Settings → Pages → Source: GitHub Actions**, then run **Publish review site** on the branch containing this code. Pushes to `feat/shypit-foundation` also trigger this workflow. The workflow runs a production browser smoke test at `/shypit/` before publishing the demo, not a production transportation service. No live deployment is performed by local setup. Vite uses relative asset paths so builds work under `/shypit/` regardless of where they were built.
 
 An empty repository may need its first pushed branch selected as the default branch in GitHub before manual workflows appear. The foundation branch can be reviewed directly without merging into a production branch.
 
