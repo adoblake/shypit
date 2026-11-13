@@ -33,6 +33,7 @@ jobs:
             echo "Add SUPABASE_ACCESS_TOKEN as a GitHub Actions repository secret before running this workflow."
             exit 1
           fi
+          export SUPABASE_ACCESS_TOKEN="$(python3 -c 'import os; print(os.environ["SUPABASE_ACCESS_TOKEN"].strip().strip(chr(34)).strip(chr(39)).strip())')"
           set +e
           supabase functions deploy shypit-auth --project-ref mzztaucyapmwlnuiljsv --no-verify-jwt --use-api > "$RUNNER_TEMP/shypit-deploy.log" 2>&1
           deployment_status=$?
