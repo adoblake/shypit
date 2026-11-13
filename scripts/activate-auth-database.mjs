@@ -30,8 +30,13 @@ export function authConfigPatch(current) {
     mailer_templates_invite: `<h2>Welcome to Shypit</h2><p>You have approved access to the private preview.</p><p><a href="${site}?flow=setup&type=invite&token_hash={{ .TokenHash }}">Create your password</a></p>`,
     mailer_templates_recovery: `<h2>Reset your Shypit password</h2><p><a href="${site}?flow=reset&type=recovery&token_hash={{ .TokenHash }}">Choose a new password</a></p><p>If you did not request this, ignore this email.</p>`,
   };
+  const customSender = Boolean(current.smtp_host);
   const patch = Object.fromEntries(
-    Object.entries(proposed).filter(([key]) => Object.hasOwn(current, key)),
+    Object.entries(proposed).filter(
+      ([key]) =>
+        Object.hasOwn(current, key) &&
+        (!key.startsWith("mailer_") || customSender),
+    ),
   );
   if (Object.hasOwn(current, "uri_allow_list")) {
     const entries = Array.isArray(current.uri_allow_list)
@@ -114,6 +119,10 @@ async function run() {
       "Supported password setup/recovery settings configured. Existing redirect entries preserved.",
     );
   }
+  if (!current.smtp_host)
+    console.log(
+      "Default email templates retained; the app supports their secure callback links.",
+    );
   const smtp = Object.hasOwn(current, "smtp_host")
     ? Boolean(current.smtp_host)
     : null;
