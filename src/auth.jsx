@@ -1,3 +1,4 @@
+import Admin from "./Admin";
 import React, {
   createContext,
   useContext,
@@ -59,6 +60,7 @@ function validData(d) {
   );
 }
 export function AuthGate({ children }) {
+  const [adminProfile, setAdminProfile] = useState(null);
   const [recovery, setRecovery] = useState(readRecoveryLink);
   const [accessMode, setAccessMode] = useState(null);
   const [signInLocked, setSignInLocked] = useState(null);
@@ -178,6 +180,7 @@ export function AuthGate({ children }) {
     setAccount(null);
     setPendingUser(null);
     setMemberships([]);
+    setAdminProfile(null);
     setPassword("");
     setShowPassword(false);
     setData(null);
@@ -231,6 +234,12 @@ export function AuthGate({ children }) {
     const current = epoch.current;
     const checkMembership = async () => {
       try {
+        if (account.role === "admin") {
+          const profile = await adminRequest("shypit_admin_profile", {});
+          if (!profile) throw Error();
+          setAdminProfile(profile);
+          return;
+        }
         const rows = await api(
           "/rest/v1/memberships?select=workspace_id,role&user_id=eq." +
             encodeURIComponent(account.userId) +
@@ -292,9 +301,28 @@ export function AuthGate({ children }) {
         "&active=eq.true",
       { access: session.access_token },
     );
+    let profile = null;
+    try {
+      profile = await api("/rest/v1/rpc/shypit_admin_profile", {
+        method: "POST",
+        body: {},
+        access: session.access_token,
+      });
+    } catch {
+      /* Admin schema may not yet be deployed; regular access remains available. */
+    }
+    if (profile?.capabilities?.length)
+      members.unshift({
+        workspace_id: "admin",
+        role: "admin",
+        display_name: "Platform administration",
+      });
+    setAdminProfile(profile);
     if (
       !members.length ||
-      members.some((member) => !["business", "driver"].includes(member.role))
+      members.some(
+        (member) => !["business", "driver", "admin"].includes(member.role),
+      )
     )
       throw Error();
     if (attempt !== epoch.current) return;
@@ -316,6 +344,17 @@ export function AuthGate({ children }) {
     setBusy(true);
     setError("");
     try {
+      if (member.role === "admin") {
+        const profile = await adminRequest("shypit_admin_profile", {});
+        if (!profile || !profile.capabilities?.length) throw Error();
+        if (attempt !== epoch.current) return;
+        setAdminProfile(profile);
+        accountRef.current = { ...member, userId: user.id, email: user.email };
+        setAccount(accountRef.current);
+        setData({});
+        setPendingUser(null);
+        return;
+      }
       const rows = await api(
         "/rest/v1/workspaces?select=id,data,revision&id=eq." +
           encodeURIComponent(member.workspace_id),
@@ -519,6 +558,9 @@ export function AuthGate({ children }) {
         }
       });
   }
+  async function adminRequest(name, body) {
+    return api("/rest/v1/rpc/" + name, { method: "POST", body });
+  }
   if (account && data)
     return (
       <Workspace.Provider value={{ data, update }}>
@@ -526,7 +568,11 @@ export function AuthGate({ children }) {
           <span>
             <ShieldCheck size={17} />
             Signed in as {account.display_name || account.email} ·{" "}
-            {account.role === "business" ? "Business" : "Carrier"}
+            {account.role === "admin"
+              ? "Admin"
+              : account.role === "business"
+                ? "Business"
+                : "Carrier"}
           </span>
           <span role="status">{saveState}</span>
           {memberships.length > 1 && (
@@ -539,7 +585,23 @@ export function AuthGate({ children }) {
             Sign out
           </button>
         </div>
-        {children({ account, initialData: data })}
+        {account.role === "admin" ? (
+          <Admin
+            request={adminRequest}
+            profile={adminProfile}
+            onAccessChanged={async () => {
+              try {
+                const p = await adminRequest("shypit_admin_profile", {});
+                if (!p) await signOut("Your admin access changed.");
+                else setAdminProfile(p);
+              } catch {
+                await signOut("Please sign in again.");
+              }
+            }}
+          />
+        ) : (
+          children({ account, initialData: data })
+        )}
       </Workspace.Provider>
     );
   return (
@@ -636,9 +698,11 @@ export function AuthGate({ children }) {
                 >
                   <span>
                     <strong>
-                      {member.role === "business"
-                        ? "Company workspace"
-                        : "Carrier / LLC workspace"}
+                      {member.role === "admin"
+                        ? "Admin workspace"
+                        : member.role === "business"
+                          ? "Company workspace"
+                          : "Carrier / LLC workspace"}
                     </strong>
                     <small>{member.display_name}</small>
                   </span>

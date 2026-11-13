@@ -1,0 +1,201 @@
+.admin-shell {
+  max-width: 1280px;
+  margin: auto;
+  padding: 30px 36px 70px;
+}
+.admin-header,
+.admin-heading,
+.admin-membership {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.admin-header {
+  margin-bottom: 48px;
+}
+.admin-badge {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  background: #e2efeb;
+  color: #17675f;
+  padding: 8px 12px;
+  border-radius: 30px;
+}
+.admin-heading h1 {
+  font-size: clamp(30px, 4vw, 46px);
+  margin: 8px 0;
+}
+.admin-heading {
+  margin-bottom: 30px;
+}
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 0 24px;
+}
+.admin-tabs button {
+  white-space: nowrap;
+}
+.admin-tabs button[aria-current] {
+  background: #237e76;
+  color: white;
+}
+.admin-shell button {
+  border: 1px solid #bacbc9;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font: inherit;
+}
+.admin-shell button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.admin-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.admin-metrics article,
+.admin-card {
+  background: #fff;
+  border: 1px solid #d9e1df;
+  border-radius: 14px;
+  padding: 24px;
+}
+.admin-metrics span {
+  font-size: 13px;
+  color: #566475;
+}
+.admin-metrics strong {
+  display: block;
+  font-size: 36px;
+  color: #15263d;
+  margin-top: 12px;
+}
+.admin-card {
+  line-height: 1.65;
+}
+.admin-card h2 {
+  margin-top: 0;
+}
+.admin-card details {
+  padding: 16px 0;
+  border-top: 1px solid #dde4e2;
+}
+.admin-card summary {
+  cursor: pointer;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.admin-card pre {
+  max-height: 350px;
+  overflow: auto;
+  background: #f4f6f5;
+  padding: 16px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.admin-person {
+  border-top: 1px solid #dde4e2;
+  padding: 22px 0;
+}
+.admin-person h3 {
+  overflow-wrap: anywhere;
+}
+.admin-person fieldset {
+  border: 1px solid #d9e1df;
+  border-radius: 10px;
+  margin: 16px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.admin-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.admin-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: #237e76;
+}
+.admin-confirm {
+  background: #edf4f1;
+  padding: 16px;
+  border-radius: 10px;
+}
+.admin-confirm button {
+  margin-right: 10px;
+}
+.admin-membership {
+  padding: 10px 0;
+}
+.admin-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+.admin-links a {
+  color: #17675f;
+  font-weight: 600;
+}
+.admin-shell :focus-visible {
+  outline: 3px solid #237e76;
+  outline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .admin-shell {
+    padding: 22px 18px 50px;
+  }
+  .admin-header {
+    margin-bottom: 30px;
+  }
+  .admin-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .admin-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .admin-card {
+    padding: 18px;
+  }
+  .admin-person fieldset {
+    flex-direction: column;
+  }
+  .admin-membership {
+    align-items: flex-start;
+  }
+  .admin-shell h1 {
+    line-height: 1.2;
+  }
+}
+.admin-header .brand {
+  color: #15263d;
+}
+.admin-records {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 12px;
+}
+.admin-record {
+  border: 1px solid #dde4e2;
+  border-radius: 10px;
+  padding: 16px;
+  overflow-wrap: anywhere;
+}
+.admin-record p {
+  margin: 8px 0;
+}
+.admin-record > span {
+  font-size: 13px;
+  color: #17675f;
+}

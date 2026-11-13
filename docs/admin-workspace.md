@@ -1,0 +1,13 @@
+# Shypit admin workspace
+
+Use the existing approved account and password, then choose **Admin workspace**. Both founders receive protected owner grants. No shared login or extra password is created. The grants are seeded from private SHA-256 email identifiers through the secured database activation workflow; no founder email addresses are stored in this public repository.
+
+Owners can review saved pilot counts and records, grant or suspend limited admin access for existing verified members, suspend or restore workspace access, and inspect the latest 100 admin access changes. Founder grants cannot be altered through the application. Founder recovery requires the Supabase project administrator. Keep project ownership and recovery access secure.
+
+Permissions are independent: `stats`, `operations` (read-only freight records), `access` (read-only accounts and memberships for delegates), `audit`, and `testing`. Only owners can change access. A person must already have a verified account and active workspace membership before admin access can be enabled. New account invitations still require private project-administrator provisioning. Admin permissions cover the entire pilot, so grant only what is needed.
+
+Every admin RPC checks the current verified identity, active private grant, and short-lived Shypit session permit. Limited admins cannot write grants, change membership, or bypass permissions by calling the API directly. Revocations take effect on the next server request; the UI also rechecks access each minute and on returning to the tab. The existing 10-attempt/24-hour authentication lock and session expiry apply to admins. No admin can retrieve another user's password.
+
+Statistics include sample records and are not financial reporting. Operations review is read-only; use the assigned company/carrier workspace to create or update test records. Build tools link to GitHub and its existing approval/permission model. The app does not run arbitrary code, deploy builds, or grant infrastructure rights. Real dispatch, payments, GPS, secure uploads, and cross-company synchronization remain pending.
+
+Apply via the existing `auth-database.yml` workflow using the two approved private invitation keys. Provisioning is idempotent and preserves saved records, membership revocations, and existing admin grants. `npm run test:policies` includes real PostgreSQL tests for protected owners, limited permissions, revocation, expired/anonymous access, and audit writes. `tests/admin.spec.js` covers desktop/mobile admin navigation and confirmed changes with a mocked transport; no test auth bypass is shipped.

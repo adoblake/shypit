@@ -31,6 +31,22 @@ export async function installAuthMock(page, options = {}) {
     const request = route.request(),
       url = new URL(request.url()),
       path = url.pathname;
+    if (path === "/rest/v1/rpc/shypit_admin_profile")
+      return route.fulfill({ json: state.adminProfile || null });
+    if (path === "/rest/v1/rpc/shypit_admin_read") {
+      const section = request.postDataJSON().p_section;
+      if (state.revokeAdminOnRead) state.adminProfile = null;
+      if (!state.adminProfile?.capabilities.includes(section))
+        return route.fulfill({ status: 403, json: { error: "denied" } });
+      return route.fulfill({ json: state.adminData?.[section] || [] });
+    }
+    if (path === "/rest/v1/rpc/shypit_admin_change") {
+      if (!state.adminProfile?.owner)
+        return route.fulfill({ status: 403, json: { error: "denied" } });
+      state.adminChanges ??= [];
+      state.adminChanges.push(request.postDataJSON());
+      return route.fulfill({ status: 204 });
+    }
     if (path === "/functions/v1/shypit-auth/health")
       return route.fulfill({
         status: state.serviceReady ? 200 : 503,

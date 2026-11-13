@@ -111,6 +111,13 @@ async function run() {
   console.log(
     "Authentication database installed; two approved preview invitations provisioned. Existing workspaces preserved.",
   );
+  const adminStatus = await call("/database/query", {
+    query:
+      "select count(*)::int as owners from shypit_private.admin_grants where owner and active;",
+  });
+  if (!Array.isArray(adminStatus) || adminStatus[0]?.owners < 2)
+    throw Error("Protected founder admin grants could not be verified.");
+  console.log("Protected founder administration is installed and verified.");
   const current = await call("/config/auth");
   const patch = authConfigPatch(current);
   if (Object.keys(patch).length) {
