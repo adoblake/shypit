@@ -33,4 +33,11 @@ jobs:
             echo "Add SUPABASE_ACCESS_TOKEN as a GitHub Actions repository secret before running this workflow."
             exit 1
           fi
-          supabase functions deploy shypit-auth --project-ref mzztaucyapmwlnuiljsv --no-verify-jwt --use-api
+          set +e
+          supabase functions deploy shypit-auth --project-ref mzztaucyapmwlnuiljsv --no-verify-jwt --use-api > "$RUNNER_TEMP/shypit-deploy.log" 2>&1
+          deployment_status=$?
+          set -e
+          if [ "$deployment_status" -ne 0 ]; then
+            python3 scripts/report-auth-deploy-error.py "$RUNNER_TEMP/shypit-deploy.log"
+          fi
+          exit "$deployment_status"
