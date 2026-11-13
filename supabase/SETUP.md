@@ -68,3 +68,7 @@ Optional email codes require `VITE_ENABLE_EMAIL_OTP=true`, a working SMTP servic
 Local tests verify browser behavior against an intercepted identity API and run the SQL policies in PostgreSQL via PGlite. They do **not** establish real Google consent, Supabase configuration, email delivery, or deployed project readiness. Those require this actual-project check.
 
 This remains a pilot data model: workspace JSON supports the existing demo journeys and optimistic revision checks, not an atomic cross-company freight marketplace, live reservations, payments, or dispatch. Move those operations to audited server transactions before real bookings.
+
+## Enable package tracking on an existing project
+
+If the original schema is already installed, run `supabase/packages-migration.sql` as the administrator before publishing the tracking module. Fresh projects use the updated `schema.sql` instead. The migration permits business members to update packages within their own workspace, validates the packages array, and keeps carrier members limited to job updates. It does not grant access to any new members. National sample loads are included when provisioning a new sample carrier workspace.

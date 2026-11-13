@@ -14,7 +14,7 @@ import {
 const Workspace = createContext(null);
 export function useWorkspaceField(field) {
   const value = useContext(Workspace);
-  return [value.data[field], (update) => value.update(field, update)];
+  return [value.data[field] ?? [], (update) => value.update(field, update)];
 }
 function validConfig(c) {
   try {
@@ -50,7 +50,8 @@ function validData(d) {
     d.shipments.length > 0 &&
     Array.isArray(d.loads) &&
     d.loads.length > 0 &&
-    Array.isArray(d.jobs)
+    Array.isArray(d.jobs) &&
+    (!Object.hasOwn(d, "packages") || Array.isArray(d.packages))
   );
 }
 export function AuthGate({ children }) {
@@ -93,7 +94,11 @@ export function AuthGate({ children }) {
       .catch((e) => {
         if (e.name !== "AbortError") setConfigured(false);
       });
-    for (const key of ["shypit.shipments.v1", "shypit.jobs.v1"])
+    for (const key of [
+      "shypit.shipments.v1",
+      "shypit.jobs.v1",
+      "shypit.packages.v1",
+    ])
       try {
         localStorage.removeItem(key);
       } catch {}
@@ -351,8 +356,9 @@ export function AuthGate({ children }) {
   }, [config]);
   function update(field, updater) {
     const owner = accountRef.current;
-    if (!owner || !["shipments", "jobs"].includes(field)) return;
-    const next = typeof updater === "function" ? updater(data[field]) : updater;
+    if (!owner || !["shipments", "jobs", "packages"].includes(field)) return;
+    const next =
+      typeof updater === "function" ? updater(data[field] ?? []) : updater;
     setData((current) => ({ ...current, [field]: next }));
     setSaveState("Saving…");
     const requestEpoch = epoch.current;

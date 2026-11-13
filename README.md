@@ -50,3 +50,9 @@ Pushes to `feat/shypit-foundation` run **Publish review site**, which builds and
 ## Pilot limitations
 
 No real freight dispatch, location tracking, carrier authority verification, billing, or payouts are connected. Prices and dates are illustrative. Proof input saves only a filename to the private workspace; files are not uploaded. Businesses and carrier workspaces are isolated pilot journeys, not a shared dispatch backend. The JSON workspace model needs normalization and audited transactional server operations before real bookings. Do not treat frontend role visibility as an authorization boundary: database policies enforce access.
+
+## Nationwide package tracking and partner review
+
+Business navigation includes **Package tracking** for number/scanner/bulk intake, shipment linkage, travel history, exceptions and downloadable company reports. Package records save to the authenticated business workspace; live carrier synchronization and email/SMS are not connected. Apply the updated schema so business members can save packages.
+
+The partner link is https://adoblake.github.io/shypit/?view=tracking and requires configured sign-in plus approved business membership. Location suggestions cover all 50 states, DC and territories. **Open Connecticut test package** and **Explore Connecticut freight** add missing sample records without overwriting existing work. Nationwide route entry does not verify carrier coverage; rates remain illustrative. See [partner testing](docs/partner-test.md) and [TMS integration](docs/tms.md).

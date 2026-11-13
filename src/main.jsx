@@ -18,6 +18,9 @@ import {
 } from "@phosphor-icons/react";
 import { AuthGate, useWorkspaceField } from "./auth";
 import "./styles.css";
+import Tracking from "./Tracking";
+import { usLocations, nationalShipments } from "./nationwide";
+
 const money = (n) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -63,10 +66,15 @@ function App({ account, initialData }) {
   const initialShipments = initialData.shipments;
   const loads = initialData.loads;
   const [page, setPage] = useState(
-      role === "business" ? "Shipments" : "Find loads",
+      role === "business"
+        ? new URLSearchParams(window.location.search).get("view") === "tracking"
+          ? "Package tracking"
+          : "Shipments"
+        : "Find loads",
     ),
     [shipments, setShipments] = useWorkspaceField("shipments"),
     [jobs, setJobs] = useWorkspaceField("jobs"),
+    [packages, setPackages] = useWorkspaceField("packages"),
     [selected, setSelected] = useState(initialShipments[0].id),
     [selectedLoad, setSelectedLoad] = useState(loads[0].id),
     [service, setService] = useState("Standard"),
@@ -115,7 +123,7 @@ function App({ account, initialData }) {
   const total = shipment.price + (service === "Priority" ? 175 : 0);
   const tabs =
     role === "business"
-      ? ["Shipments", "Network", "Billing"]
+      ? ["Shipments", "Package tracking", "Network", "Billing"]
       : ["Find loads", "My jobs", "Earnings", "Documents"];
   const revealDetails = () => {
     if (window.matchMedia("(max-width: 700px)").matches)
@@ -220,7 +228,14 @@ function App({ account, initialData }) {
           </button>
         </div>
       )}
-      {role === "business" && page === "Shipments" ? (
+      {page === "Package tracking" ? (
+        <Tracking
+          packages={packages}
+          setPackages={setPackages}
+          shipments={shipments}
+          onFreight={() => setPage("Shipments")}
+        />
+      ) : role === "business" && page === "Shipments" ? (
         <main className="workspace">
           <section className="main-panel">
             <div className="heading-row">
@@ -228,12 +243,41 @@ function App({ account, initialData }) {
                 <p className="eyebrow">YOUR SHIPPING WORKSPACE</p>
                 <h1>Keep your freight moving.</h1>
                 <p className="muted subtitle">
-                  One place for every mile ahead.
+                  Plan U.S. routes from Connecticut to the West Coast and
+                  beyond. All rates and carrier availability are illustrative.
                 </p>
               </div>
               <button className="small-button" onClick={() => setModal("new")}>
                 <Plus />
                 New shipment
+              </button>
+            </div>
+            <div className="national-intro">
+              <strong>U.S. shipping review</strong>
+              <p>
+                Create a freight shipment between any U.S. locations, or track
+                individual packages and carrier handoffs.
+              </p>
+              <button
+                className="small-button"
+                onClick={() => setPage("Package tracking")}
+              >
+                Test package shipping
+              </button>
+              <button
+                className="small-button"
+                onClick={() => {
+                  setShipments((all) => [
+                    ...all,
+                    ...nationalShipments.filter(
+                      (s) => !all.some((p) => p.id === s.id),
+                    ),
+                  ]);
+                  setSelected("SHP-US-CT");
+                  revealDetails();
+                }}
+              >
+                Explore Connecticut freight
               </button>
             </div>
             <div className="shipment-table">
@@ -870,8 +914,16 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
       <p className="eyebrow">LET’S GET IT MOVING</p>
       <h2 id="modal-title">{repeat ? "Repeat a route" : "New shipment"}</h2>
       <p className="helper">
-        Demo quotes use a fixed sample rate; route pricing is not connected.
+        Enter any U.S. city and state, DC, or territory. Suggestions are
+        optional. Demo quotes use a fixed sample rate; route pricing and carrier
+        availability are not connected. Alaska, Hawaii and territory service
+        requires carrier confirmation.
       </p>
+      <datalist id="us-shipment-locations">
+        {usLocations.map((location) => (
+          <option key={location} value={location} />
+        ))}
+      </datalist>
       <div className="form-grid">
         <label>
           Pickup location
@@ -879,7 +931,8 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
             required
             name="from"
             defaultValue={repeat?.from}
-            placeholder="City, state"
+            placeholder="City, state (e.g. Hartford, CT)"
+            list="us-shipment-locations"
             maxLength={80}
           />
         </label>
@@ -889,7 +942,8 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
             required
             name="to"
             defaultValue={repeat?.to}
-            placeholder="City, state"
+            placeholder="City, state (e.g. Hartford, CT)"
+            list="us-shipment-locations"
             maxLength={80}
           />
         </label>

@@ -1,3 +1,4 @@
+import { nationalShipments, nationalLoads } from "../../src/nationwide.js";
 export const initialShipments = [
   {
     id: "SHP-1042",
@@ -86,3 +87,7 @@ export const loads = [
     cargo: "Office equipment",
   },
 ];
+
+loads.push(...nationalLoads);
+
+initialShipments.push(...nationalShipments);
