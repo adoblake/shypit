@@ -18,6 +18,9 @@ import AccountAccess, {
   readRecoveryLink,
 } from "./AccountAccess";
 const Workspace = createContext(null);
+export function useBanking() {
+  return useContext(Workspace).bankingRequest;
+}
 export function useWorkspaceField(field) {
   const value = useContext(Workspace);
   return [value.data[field] ?? [], (update) => value.update(field, update)];
@@ -559,12 +562,46 @@ export function AuthGate({ children }) {
         }
       });
   }
+  async function bankingRequest(action) {
+    if (!token.current || !accountRef.current)
+      throw Error("Please sign in again.");
+    let response, result;
+    try {
+      response = await fetch(
+        config.url.replace(/\/$/, "") + "/functions/v1/shypit-banking",
+        {
+          method: "POST",
+          headers: {
+            apikey: config.publicKey,
+            Authorization: "Bearer " + token.current,
+            "Content-Type": "application/json",
+          },
+          credentials: "omit",
+          redirect: "error",
+          cache: "no-store",
+          signal: AbortSignal.timeout(25000),
+          body: JSON.stringify({
+            action,
+            workspaceId: accountRef.current.workspace_id,
+          }),
+        },
+      );
+      result = await response.json();
+    } catch {
+      throw Error(
+        "Banking services cannot be reached. Please try again later.",
+      );
+    }
+    if (!response.ok)
+      throw Error(result.error || "Banking services are unavailable.");
+    return result;
+  }
   async function adminRequest(name, body) {
     return api("/rest/v1/rpc/" + name, { method: "POST", body });
   }
   if (account && data)
     return (
-      <Workspace.Provider value={{ data, update }}>
+      <Workspace.Provider value={{ data, update, bankingRequest }}>
         <div className="session-strip">
           <span>
             <ShieldCheck size={17} />

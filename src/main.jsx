@@ -1,3 +1,4 @@
+import Banking from "./Banking";
 import Brand from "./Brand";
 import React, { useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
@@ -657,6 +658,7 @@ function App({ account, initialData }) {
               <p className="muted">
                 Illustrative ledger. No real payments are processed.
               </p>
+              <Banking kind="driver" />
               <div className="earnings-summary">
                 <Wallet size={32} />
                 <div>
@@ -754,6 +756,7 @@ function App({ account, initialData }) {
                   <strong>Subscription pricing to be determined</strong>
                 </div>
               </div>
+              <Banking kind="business" />
               <h2>Shipment activity</h2>
               {shipments
                 .filter((s) => s.status !== "Ready to book")
@@ -768,7 +771,7 @@ function App({ account, initialData }) {
                 ))}
               <p className="helper">
                 <Info />
-                No billing account or payment processor is connected.
+                Real subscription billing and shipment charges are not enabled.
               </p>
             </>
           )}

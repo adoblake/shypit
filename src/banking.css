@@ -1,0 +1,59 @@
+.banking-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: white;
+  padding: 26px;
+  margin: 28px 0;
+  max-width: 760px;
+  line-height: 1.6;
+}
+.banking-title {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.banking-title > svg {
+  color: var(--teal);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+.banking-title h2 {
+  font-size: 23px;
+  margin-bottom: 8px;
+}
+.banking-title p {
+  color: var(--muted);
+}
+.banking-status {
+  background: var(--pale-teal);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-weight: 600;
+}
+.banking-card p > svg {
+  margin-right: 5px;
+  color: var(--teal);
+}
+.banking-test {
+  border-left: 3px solid var(--teal);
+  padding-left: 12px;
+}
+.banking-card .primary {
+  width: auto;
+  max-width: 100%;
+  gap: 12px;
+}
+.banking-card .text-button {
+  min-height: 44px;
+}
+.banking-card .helper {
+  margin: 16px 0 0;
+}
+@media (max-width: 700px) {
+  .banking-card {
+    padding: 20px;
+  }
+  .banking-card .primary {
+    width: 100%;
+  }
+}

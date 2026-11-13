@@ -370,7 +370,28 @@ function AccessUser({ user, memberships, canEdit, busy, change }) {
         <div className="admin-membership" key={m.workspace_id}>
           <span>
             {m.display_name} · {m.active ? "Active" : "Suspended"}
+            {user.owner || m.finance_manager ? " · Finance manager" : ""}
           </span>
+          {canEdit && m.active && (
+            <button
+              disabled={busy}
+              onClick={() => {
+                if (
+                  window.confirm(
+                    `${m.finance_manager ? "Remove" : "Grant"} finance management for ${user.email} in ${m.display_name}?`,
+                  )
+                )
+                  change("finance-access", user.id, {
+                    workspace_id: m.workspace_id,
+                    active: !m.finance_manager,
+                  });
+              }}
+            >
+              {m.finance_manager
+                ? "Remove finance access"
+                : "Grant finance access"}
+            </button>
+          )}
           {canEdit && (
             <button
               disabled={busy}

@@ -48,6 +48,9 @@ const security = (await readFile("supabase/auth-security.sql", "utf8"))
 const admin = (await readFile("supabase/admin.sql", "utf8"))
   .replace(/^begin;$/m, "")
   .replace(/^commit;$/m, "");
+const banking = (await readFile("supabase/banking.sql", "utf8"))
+  .replace(/^begin;$/m, "")
+  .replace(/^commit;$/m, "");
 console.log(`-- PRIVATE setup. This allowlists the approved emails; it does not choose passwords.
 -- Run as project administrator, deploy the shypit-auth Edge Function, and configure SMTP.
 -- Then each founder uses Create your password and verifies their email link.
@@ -57,6 +60,7 @@ ${schema}
 ${migration}
 ${security}
 ${admin}
+${banking}
 insert into shypit_private.admin_grants(email_key,owner,active)
 select ${hashed ? "email" : "encode(sha256(convert_to(lower(email),'UTF8')),'hex')"},true,true from (values (${quote(ownerEmail)}),(${quote(ronaldEmail)})) v(email)
 on conflict(email_key) do nothing;

@@ -31,6 +31,32 @@ export async function installAuthMock(page, options = {}) {
     const request = route.request(),
       url = new URL(request.url()),
       path = url.pathname;
+    if (path === "/functions/v1/shypit-banking") {
+      const input = request.postDataJSON();
+      state.bankingCalls ??= [];
+      state.bankingCalls.push(input);
+      if (state.bankingFailure)
+        return route.fulfill({
+          status: 503,
+          json: { error: "Banking services are unavailable." },
+        });
+      if (input.action === "start")
+        return route.fulfill({
+          json: {
+            url:
+              state.bankingUrl ||
+              "https://checkout.stripe.com/c/pay/test_preview",
+            mode: "test",
+          },
+        });
+      return route.fulfill({
+        json: state.banking || {
+          configured: false,
+          canManage: true,
+          state: "unavailable",
+        },
+      });
+    }
     if (path === "/rest/v1/rpc/shypit_admin_profile")
       return route.fulfill({ json: state.adminProfile || null });
     if (path === "/rest/v1/rpc/shypit_admin_read") {

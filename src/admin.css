@@ -216,3 +216,7 @@
   margin: 0;
   flex: 0 0 18px;
 }
+
+.admin-membership {
+  flex-wrap: wrap;
+}

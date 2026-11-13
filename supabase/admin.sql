@@ -31,7 +31,7 @@ begin
  when 'operations' then
   select coalesce(jsonb_agg(jsonb_build_object('id',id,'kind',kind,'revision',revision,'data',data) order by kind,id),'[]') into result from public.workspaces;
  when 'access' then
-  select jsonb_build_object('users',coalesce((select jsonb_agg(jsonb_build_object('id',u.id,'email',u.email,'owner',coalesce(g.owner,false),'active',coalesce(g.active,false),'capabilities',coalesce(g.capabilities,'{}'::text[])) order by u.email) from auth.users u left join shypit_private.admin_grants g on g.email_key=encode(sha256(convert_to(lower(u.email),'UTF8')),'hex') where u.email_confirmed_at is not null and (g.email_key is not null or exists(select 1 from public.memberships m where m.user_id=u.id))),'[]'::jsonb),'memberships',coalesce((select jsonb_agg(to_jsonb(m)) from public.memberships m),'[]'::jsonb)) into result;
+  select jsonb_build_object('users',coalesce((select jsonb_agg(jsonb_build_object('id',u.id,'email',u.email,'owner',coalesce(g.owner,false),'active',coalesce(g.active,false),'capabilities',coalesce(g.capabilities,'{}'::text[])) order by u.email) from auth.users u left join shypit_private.admin_grants g on g.email_key=encode(sha256(convert_to(lower(u.email),'UTF8')),'hex') where u.email_confirmed_at is not null and (g.email_key is not null or exists(select 1 from public.memberships m where m.user_id=u.id))),'[]'::jsonb),'memberships',coalesce((select jsonb_agg(to_jsonb(m)||jsonb_build_object('finance_manager',exists(select 1 from shypit_private.finance_managers f where f.user_id=m.user_id and f.workspace_id=m.workspace_id))) from public.memberships m),'[]'::jsonb)) into result;
  when 'audit' then
   select coalesce(jsonb_agg(to_jsonb(a) order by a.id desc),'[]') into result from (select * from shypit_private.admin_audit order by id desc limit 100) a;
  when 'testing' then
@@ -70,6 +70,15 @@ begin
   update public.memberships set active=(p_options->>'active')::boolean where user_id=p_target and workspace_id=(p_options->>'workspace_id')::uuid;
   -- Persist revocation in invitation too; a later login must not restore access.
   update shypit_private.preview_invitations set active=(p_options->>'active')::boolean where email_key=target_key and workspace_id=(p_options->>'workspace_id')::uuid;
+ elsif p_action='finance-access' then
+  if jsonb_typeof(p_options->'active') is distinct from 'boolean' then raise exception 'Invalid finance settings'; end if;
+  if not exists(select 1 from public.memberships where user_id=p_target and workspace_id=(p_options->>'workspace_id')::uuid and active) then raise exception 'Active membership required'; end if;
+  before_value:=jsonb_build_object('active',exists(select 1 from shypit_private.finance_managers where user_id=p_target and workspace_id=(p_options->>'workspace_id')::uuid));
+  if (p_options->>'active')::boolean then
+   insert into shypit_private.finance_managers(user_id,workspace_id) values(p_target,(p_options->>'workspace_id')::uuid) on conflict do nothing;
+  else
+   delete from shypit_private.finance_managers where user_id=p_target and workspace_id=(p_options->>'workspace_id')::uuid;
+  end if;
  else raise exception 'Unknown action'; end if;
  insert into shypit_private.admin_audit(actor,action,target,details) values(auth.uid(),p_action,p_target::text,jsonb_build_object('before',before_value,'after',p_options));
 end;
