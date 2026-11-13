@@ -1479,15 +1479,28 @@ footer .brand-lockup {
   width: auto;
   min-height: 44px;
 }
-.login-help {
-  margin: 12px 0;
-  color: var(--muted);
+
+.field-help {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 20px;
+  margin: 2px 0 18px;
+}
+.field-help button {
+  color: var(--teal);
   font-size: 13px;
+  min-height: 44px;
+  padding: 6px 0;
+  text-align: left;
 }
-.login-help summary {
-  cursor: pointer;
-  padding: 10px 0;
+.password-form .field-help + label {
+  margin-top: 0;
 }
-.login-help .account-links {
-  margin-top: 4px;
+.password-form .password-help {
+  margin-bottom: 10px;
+}
+.password-form #login-email,
+.password-form #login-password {
+  margin-bottom: 0;
 }

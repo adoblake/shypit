@@ -121,7 +121,7 @@ test("public Admin Login leads to checked admin sign-in with account help in con
     page.getByRole("heading", { name: "Admin sign-in." }),
   ).toBeVisible();
   await expect(
-    page.getByText("Admin account help", { exact: true }),
+    page.getByRole("button", { name: "Forgot password?", exact: true }),
   ).toBeVisible();
   await page
     .getByLabel("Email address", { exact: true })

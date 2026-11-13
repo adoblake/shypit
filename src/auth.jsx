@@ -887,6 +887,15 @@ export function AuthGate({ children }) {
                       setSignInLocked(false);
                     }}
                   />
+                  <div className="field-help email-help">
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => setAccessMode("email-help")}
+                    >
+                      Forgot email?
+                    </button>
+                  </div>
                   <label htmlFor="login-password">Password</label>
                   <div className="password-input">
                     <input
@@ -907,6 +916,22 @@ export function AuthGate({ children }) {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                  <div className="field-help password-help">
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => setAccessMode("setup")}
+                    >
+                      Create your password
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => setAccessMode("reset")}
+                    >
+                      Forgot password?
                     </button>
                   </div>
                   <button
@@ -942,33 +967,7 @@ export function AuthGate({ children }) {
                         : "Admin Login"}
                     </button>
                   </div>
-                  <details className="login-help">
-                    <summary>
-                      {loginKind === "admin"
-                        ? "Admin account help"
-                        : "Password setup & account help"}
-                    </summary>
-                    <div className="account-links">
-                      <button
-                        type="button"
-                        onClick={() => setAccessMode("setup")}
-                      >
-                        Create your password
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setAccessMode("reset")}
-                      >
-                        Forgot password?
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setAccessMode("email-help")}
-                      >
-                        Forgot email?
-                      </button>
-                    </div>
-                  </details>
+
                   <p className="auth-note">
                     10 failed attempts lock sign-in for 24 hours. Limits are
                     enforced by the server.

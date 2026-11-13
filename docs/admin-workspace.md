@@ -1,6 +1,6 @@
 # Shypit admin workspace
 
-Use the existing approved account and password, then choose **Admin Login**. The public sign-in page also has an **Admin Login** text action that opens the admin sign-in flow. Password setup and recovery remain under the relevant account-help control. Both founders receive protected owner grants. No shared login or extra password is created. The grants are seeded from private SHA-256 email identifiers through the secured database activation workflow; no founder email addresses are stored in this public repository.
+Use the existing approved account and password, then choose **Admin Login**. The public sign-in page also has an **Admin Login** text action that opens the admin sign-in flow. Email recovery sits beneath the email field; password creation and recovery sit beneath the password field. Both founders receive protected owner grants. No shared login or extra password is created. The grants are seeded from private SHA-256 email identifiers through the secured database activation workflow; no founder email addresses are stored in this public repository.
 
 Owners can review saved pilot counts and records, grant or suspend limited admin access for existing verified members, suspend or restore workspace access, and inspect the latest 100 admin access changes. Founder grants cannot be altered through the application. Founder recovery requires the Supabase project administrator. Keep project ownership and recovery access secure.
 

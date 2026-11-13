@@ -6,9 +6,6 @@ test("password creation and reset request a secure email link without exposing a
   await installAuthMock(page, { emailOtpEnabled: false, googleEnabled: false });
   await page.goto("/");
   await page
-    .getByText("Password setup & account help", { exact: true })
-    .click();
-  await page
     .getByRole("button", { name: "Create your password", exact: true })
     .click();
   await expect(
@@ -22,9 +19,6 @@ test("password creation and reset request a secure email link without exposing a
     "If this address has approved access",
   );
   await page.getByRole("button", { name: "Back to sign-in" }).click();
-  await page
-    .getByText("Password setup & account help", { exact: true })
-    .click();
   await page.getByRole("button", { name: "Forgot password?" }).click();
   await expect(
     page.getByRole("heading", { name: "Reset your password." }),
@@ -80,9 +74,6 @@ test("forgot-email requests private administrator review without disclosing save
 }) => {
   await installAuthMock(page, { emailOtpEnabled: false, googleEnabled: false });
   await page.goto("/");
-  await page
-    .getByText("Password setup & account help", { exact: true })
-    .click();
   await page.getByRole("button", { name: "Forgot email?" }).click();
   await page.getByLabel("Full name").fill("Preview founder");
   await page.getByLabel("Business or LLC name").fill("Sample LLC");
@@ -118,9 +109,6 @@ test("recovery request limit disables sending after the server refuses the next 
 }) => {
   await installAuthMock(page, { emailOtpEnabled: false, googleEnabled: false });
   await page.goto("/");
-  await page
-    .getByText("Password setup & account help", { exact: true })
-    .click();
   await page.getByRole("button", { name: "Forgot password?" }).click();
   await page
     .getByLabel("Email address", { exact: true })
@@ -155,9 +143,6 @@ test("missing backend disables sending, explains activation and allows a fresh c
     page.getByRole("button", { name: "Sign in", exact: true }),
   ).toBeDisabled();
   await page
-    .getByText("Password setup & account help", { exact: true })
-    .click();
-  await page
     .getByRole("button", { name: "Create your password", exact: true })
     .click();
   await expect(
@@ -181,9 +166,6 @@ test("a network failure is explained without claiming an email was sent", async 
     r.abort("failed"),
   );
   await page.goto("/");
-  await page
-    .getByText("Password setup & account help", { exact: true })
-    .click();
   await page
     .getByRole("button", { name: "Create your password", exact: true })
     .click();
