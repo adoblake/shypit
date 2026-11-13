@@ -48,3 +48,7 @@ There is no login, backend, cross-device sync, live carrier verification, live t
 ## Next production steps
 
 Add authenticated business/carrier accounts and server-side authorization; a database with audited shipment/job transitions and atomic load reservation; carrier authority/insurance verification; shipment eligibility and service terms; route/rate APIs; secure proof storage; billing/subscriptions and payout integrations; real tracking with consent; notifications; cancellation/dispute and waiting-time policies. Validate these with pilot businesses and carriers before real freight bookings.
+
+## Package tracking / TMS
+
+Business navigation now includes **Package tracking**: manual/scanner intake, generated package numbers, tab-separated bulk intake, carrier-specific duplicate detection, shipment linkage, a searchable status queue, travel-event history, and downloadable company updates. Records remain in this browser only. Live carrier syncing, shared company access and email/SMS delivery are not connected. See [the TMS guide and live integration plan](docs/tms.md).

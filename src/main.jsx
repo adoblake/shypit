@@ -18,6 +18,8 @@ import {
 } from "@phosphor-icons/react";
 import { initialShipments, loads } from "./data";
 import "./styles.css";
+import Tracking from "./Tracking";
+import { packageKey, samplePackages } from "./tracking";
 const money = (n) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -80,6 +82,7 @@ function App() {
       "shypit.shipments.v1",
       initialShipments,
     ),
+    [packages, setPackages] = useSaved(packageKey, samplePackages),
     [jobs, setJobs] = useSaved("shypit.jobs.v1", []),
     [selected, setSelected] = useState(initialShipments[0].id),
     [selectedLoad, setSelectedLoad] = useState(loads[0].id),
@@ -129,7 +132,7 @@ function App() {
   const total = shipment.price + (service === "Priority" ? 175 : 0);
   const tabs =
     role === "business"
-      ? ["Shipments", "Network", "Billing"]
+      ? ["Shipments", "Package tracking", "Network", "Billing"]
       : ["Find loads", "My jobs", "Earnings", "Documents"];
   const revealDetails = () => {
     if (window.matchMedia("(max-width: 700px)").matches)
@@ -248,7 +251,13 @@ function App() {
           </button>
         </div>
       )}
-      {role === "business" && page === "Shipments" ? (
+      {page === "Package tracking" ? (
+        <Tracking
+          packages={packages}
+          setPackages={setPackages}
+          shipments={shipments}
+        />
+      ) : role === "business" && page === "Shipments" ? (
         <main className="workspace">
           <section className="main-panel">
             <div className="heading-row">
@@ -850,13 +859,15 @@ function App() {
               <>
                 <h2 id="modal-title">Reset this demo?</h2>
                 <p>
-                  This removes shipment and job changes stored on this device.
+                  This removes shipment, package, and job changes stored on this
+                  device.
                 </p>
                 <button
                   className="primary"
                   onClick={() => {
                     setShipments(initialShipments);
                     setJobs([]);
+                    setPackages(samplePackages);
                     setSelected(initialShipments[0].id);
                     setModal(null);
                     flash("Demo reset.");
