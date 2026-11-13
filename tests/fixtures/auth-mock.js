@@ -30,6 +30,78 @@ export async function installAuthMock(page, options = {}) {
     const request = route.request(),
       url = new URL(request.url()),
       path = url.pathname;
+    if (path === "/functions/v1/shypit-auth") {
+      const input = request.postDataJSON();
+      state.authFailures ??= 0;
+      state.recoveryCounts ??= {};
+      if (input.action === "signin") {
+        if (state.authFailures >= 10)
+          return route.fulfill({
+            status: 429,
+            json: {
+              error: "Too many attempts. This process is locked for 24 hours.",
+              lockedUntil: new Date(Date.now() + 86400000).toISOString(),
+            },
+          });
+        if (state.badCode) {
+          state.authFailures++;
+          return route.fulfill({
+            status: state.authFailures >= 10 ? 429 : 400,
+            json: {
+              error:
+                state.authFailures >= 10
+                  ? "Too many attempts. This process is locked for 24 hours."
+                  : "Unable to sign in.",
+            },
+          });
+        }
+        state.authFailures = 0;
+        return route.fulfill({
+          json: {
+            access_token: "test-valid-access",
+            expires_at: state.expiresAt || Math.floor(Date.now() / 1000) + 900,
+          },
+        });
+      }
+      const k = input.action + ":" + input.email;
+      state.recoveryCounts[k] ??= 0;
+      if (state.recoveryCounts[k] >= 10)
+        return route.fulfill({
+          status: 429,
+          json: {
+            error: "Too many attempts. This process is locked for 24 hours.",
+            lockedUntil: new Date(Date.now() + 86400000).toISOString(),
+          },
+        });
+      state.recoveryCounts[k]++;
+      if (input.action === "complete") {
+        if (
+          input.tokenHash !== "valid-once" &&
+          input.accessToken !== "valid-recovery"
+        )
+          return route.fulfill({
+            status: 400,
+            json: {
+              error:
+                "Unable to complete this request. Check your details or contact your administrator.",
+            },
+          });
+        return route.fulfill({
+          json: {
+            message:
+              "Your password is set. Return to sign-in and use your email and new password.",
+          },
+        });
+      }
+      return route.fulfill({
+        json: {
+          message:
+            input.action === "email-help"
+              ? "Your access request has been recorded for administrator review. No registered email address is disclosed."
+              : "If this address has approved access, check its inbox for a secure link.",
+        },
+      });
+    }
     if (path === "/auth/v1/otp") return route.fulfill({ json: {} });
     if (path === "/auth/v1/verify" || path === "/auth/v1/token")
       return state.badCode

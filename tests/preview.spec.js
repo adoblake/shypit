@@ -22,7 +22,7 @@ test("email/password authenticates with provider; invalid password stays locked"
   });
   let body;
   page.on("request", (r) => {
-    if (r.url().includes("grant_type=password")) body = r.postDataJSON();
+    if (r.url().includes("/functions/v1/shypit-auth")) body = r.postDataJSON();
   });
   await page.goto("/");
   await passwordSignIn(page);

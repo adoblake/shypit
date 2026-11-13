@@ -1352,3 +1352,19 @@ dialog[open] {
 .session-strip button:first-of-type {
   margin-left: auto;
 }
+.account-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 16px;
+  margin-top: 15px;
+}
+.account-links button {
+  padding: 10px 0;
+  min-height: 44px;
+  color: #087f78;
+  font-size: 13px;
+  text-align: left;
+}
+.auth-form form .auth-note {
+  margin-top: 12px;
+}

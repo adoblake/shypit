@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 const db = new PGlite();
 try {
   await db.exec(
-    `create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;insert into auth.users values('11111111-1111-4111-8111-111111111111','owner@example.test',now()),('22222222-2222-4222-8222-222222222222','ronald@example.test',now());`,
+    `create role anon;create role authenticated;create role service_role;create schema auth;create function auth.jwt() returns jsonb language sql stable as $$select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb$$;create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth,public to authenticated,anon;grant execute on function auth.uid() to authenticated,anon;insert into auth.users values('11111111-1111-4111-8111-111111111111','owner@example.test',now()),('22222222-2222-4222-8222-222222222222','ronald@example.test',now());`,
   );
   const sql = execFileSync(
     process.execPath,
@@ -27,6 +27,9 @@ try {
   );
   console.log(
     "PASS both founders receive two explicitly approved preview memberships",
+  );
+  await db.exec(
+    "select public.shypit_permit_session('cccccccc-cccc-4ccc-8ccc-cccccccccccc','11111111-1111-4111-8111-111111111111',repeat('f',64),now()+interval '15 minutes');set \"request.jwt.claims\"='{\"session_id\":\"cccccccc-cccc-4ccc-8ccc-cccccccccccc\"}'",
   );
   await db.exec(
     `set role authenticated;set "request.jwt.claim.sub"='11111111-1111-4111-8111-111111111111'`,

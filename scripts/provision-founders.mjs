@@ -36,28 +36,31 @@ begin
 end;
 $migration$;`
     : "";
-console.log(`-- PRIVATE account setup: review and run in Supabase SQL Editor as administrator.
--- Create both confirmed Auth users first; passwords belong only in the secure Supabase UI.
--- This file contains approved emails. Do not commit generated output to a public repository.
--- Preview workspaces contain fictional sample data. Existing preview changes are preserved.
+const security = (await readFile("supabase/auth-security.sql", "utf8"))
+  .replace(/^begin;$/m, "")
+  .replace(/^commit;$/m, "");
+console.log(`-- PRIVATE setup. This allowlists the approved emails; it does not choose passwords.
+-- Run as project administrator, deploy the shypit-auth Edge Function, and configure SMTP.
+-- Then each founder uses Create your password and verifies their email link.
+-- Keep this generated file out of the public repository.
 begin;
 ${schema}
 ${migration}
-do $founders$
-declare owner_user uuid; ronald_user uuid;
-begin
- select id into strict owner_user from auth.users where lower(email)=lower(${quote(ownerEmail)}) and email_confirmed_at is not null;
- select id into strict ronald_user from auth.users where lower(email)=lower(${quote(ronaldEmail)}) and email_confirmed_at is not null;
- insert into public.workspaces(id,kind,data) values
+${security}
+insert into public.workspaces(id,kind,data) values
  ('a1111111-1111-4111-8111-111111111111','business',${quote(data)}::jsonb),
  ('b2222222-2222-4222-8222-222222222222','driver',${quote(data)}::jsonb)
- on conflict(id) do nothing;
- insert into public.memberships(user_id,workspace_id,role,display_name,active) values
- (owner_user,'a1111111-1111-4111-8111-111111111111','business','Company preview',true),
- (owner_user,'b2222222-2222-4222-8222-222222222222','driver','LLC carrier preview',true),
- (ronald_user,'a1111111-1111-4111-8111-111111111111','business','Company preview',true),
- (ronald_user,'b2222222-2222-4222-8222-222222222222','driver','LLC carrier preview',true)
- on conflict(user_id,workspace_id) do nothing;
-end;
-$founders$;
+on conflict(id) do nothing;
+insert into shypit_private.preview_invitations(email_key,workspace_id,role,display_name,active)
+select encode(sha256(convert_to(lower(email),'UTF8')),'hex'),workspace_id,role,display_name,true from (values
+ (${quote(ownerEmail)},'a1111111-1111-4111-8111-111111111111'::uuid,'business','Company preview'),
+ (${quote(ownerEmail)},'b2222222-2222-4222-8222-222222222222'::uuid,'driver','LLC carrier preview'),
+ (${quote(ronaldEmail)},'a1111111-1111-4111-8111-111111111111'::uuid,'business','Company preview'),
+ (${quote(ronaldEmail)},'b2222222-2222-4222-8222-222222222222'::uuid,'driver','LLC carrier preview')
+) v(email,workspace_id,role,display_name)
+on conflict(email_key,workspace_id) do nothing;
+-- Existing verified users keep their accounts. New users activate after proving email ownership.
+insert into public.memberships(user_id,workspace_id,role,display_name,active)
+select u.id,i.workspace_id,i.role,i.display_name,true from auth.users u join shypit_private.preview_invitations i on i.email_key=encode(sha256(convert_to(lower(u.email),'UTF8')),'hex') where u.email_confirmed_at is not null and i.active
+on conflict(user_id,workspace_id) do nothing;
 commit;`);

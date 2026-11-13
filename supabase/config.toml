@@ -1,0 +1,3 @@
+project_id = "shypit"
+[functions.shypit-auth]
+verify_jwt = false

@@ -2,6 +2,10 @@
 
 The supplied public project settings are connected in code. Until provider/database activation, no private workspace can open; the sign-in screen may appear but successful live access is not yet verified. There is no demo password, local-storage authentication flag, or publicly accessible workspace dataset in the built site.
 
+## Current password setup and recovery
+
+Use [the account recovery guide](../docs/account-recovery.md) for the active password flow, server gateway, 10-attempt locks, SMTP configuration and secure email templates. The updated founder SQL allowlists approved emails without requiring pre-created Auth users. Native Google/email-code adapters below are legacy alternatives and must remain disabled until routed through the same gateway/session-permit policy.
+
 ## Private founder preview
 
 The current preview uses email/password, not Google. Follow [the founder access guide](../docs/preview-access.md) to create confirmed accounts and explicitly assign both workspaces. For this manually provisioned preview, existing confirmed users can sign in without an SMTP service. The Google and email-code sections below are optional alternatives.

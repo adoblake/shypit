@@ -11,6 +11,10 @@ import {
   SignOut,
   ShieldCheck,
 } from "@phosphor-icons/react";
+import AccountAccess, {
+  accountRequest,
+  readRecoveryLink,
+} from "./AccountAccess";
 const Workspace = createContext(null);
 export function useWorkspaceField(field) {
   const value = useContext(Workspace);
@@ -55,6 +59,9 @@ function validData(d) {
   );
 }
 export function AuthGate({ children }) {
+  const [recovery, setRecovery] = useState(readRecoveryLink);
+  const [accessMode, setAccessMode] = useState(null);
+  const [signInLocked, setSignInLocked] = useState(null);
   const [config, setConfig] = useState(null),
     [configured, setConfigured] = useState(null),
     [stage, setStage] = useState("email"),
@@ -70,6 +77,14 @@ export function AuthGate({ children }) {
     [account, setAccount] = useState(null),
     [data, setData] = useState(null),
     [saveState, setSaveState] = useState("");
+  useEffect(() => {
+    if (!signInLocked) return;
+    const timer = setTimeout(
+      () => setSignInLocked(null),
+      Math.max(0, new Date(signInLocked).getTime() - Date.now()),
+    );
+    return () => clearTimeout(timer);
+  }, [signInLocked]);
   const callbackHandled = useRef(false);
   const token = useRef(null),
     accountRef = useRef(null),
@@ -152,6 +167,12 @@ export function AuthGate({ children }) {
   async function signOut(reason = "You have been signed out.") {
     const access = token.current;
     clearSession(reason);
+    if (access)
+      try {
+        await accountRequest(config, { action: "logout", accessToken: access });
+      } catch {
+        /* Local access is already cleared; the short-lived server permit still expires. */
+      }
     if (access)
       try {
         await api("/auth/v1/logout", { method: "POST", access });
@@ -302,18 +323,26 @@ export function AuthGate({ children }) {
     setMessage("");
     const attempt = epoch.current;
     try {
-      const session = await api("/auth/v1/token?grant_type=password", {
-        method: "POST",
-        access: null,
-        body: { email: email.trim().toLowerCase(), password },
+      const session = await accountRequest(config, {
+        action: "signin",
+        email: email.trim().toLowerCase(),
+        password,
       });
       await establishSession(session, attempt);
-    } catch {
+    } catch (e) {
       setPassword("");
       setShowPassword(false);
       setError(
-        "Unable to sign in. Check your email and password, or ask your administrator to confirm preview access.",
+        e.status === 429
+          ? e.message
+          : e.status === 400
+            ? "Unable to sign in. Check your email and password, or confirm your preview invitation."
+            : "Account services are not activated or are unavailable. Please contact your administrator.",
       );
+      if (e.status === 429)
+        setSignInLocked(
+          e.lockedUntil || new Date(Date.now() + 86400000).toISOString(),
+        );
     } finally {
       setBusy(false);
     }
@@ -516,17 +545,36 @@ export function AuthGate({ children }) {
           <span className="auth-lock">
             <LockKey size={30} />
           </span>
-          <p className="eyebrow">WELCOME TO SHYPIT</p>
-          <h2>
-            {pendingUser
-              ? "Choose your workspace."
-              : "Sign in to your workspace."}
-          </h2>
-          <p className="muted">
-            Use the email address invited by your business or carrier
-            administrator.
-          </p>
-          {pendingUser ? (
+          {!(accessMode || recovery) && (
+            <>
+              <p className="eyebrow">WELCOME TO SHYPIT</p>
+              <h2>
+                {pendingUser
+                  ? "Choose your workspace."
+                  : "Sign in to your workspace."}
+              </h2>
+              <p className="muted">
+                Use the email address invited by your business or carrier
+                administrator.
+              </p>
+            </>
+          )}
+          {configured && (accessMode || recovery) ? (
+            <AccountAccess
+              key={accessMode || "password-link"}
+              config={config}
+              mode={accessMode || "reset"}
+              email={email}
+              setEmail={setEmail}
+              recovery={recovery}
+              onBack={() => {
+                setAccessMode(null);
+                setRecovery(null);
+                setError("");
+                setMessage("");
+              }}
+            />
+          ) : pendingUser ? (
             <div className="workspace-choices">
               <p className="muted">
                 Only workspaces assigned to your account are available.
@@ -581,7 +629,10 @@ export function AuthGate({ children }) {
                     maxLength={254}
                     value={email}
                     disabled={busy}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setSignInLocked(false);
+                    }}
                   />
                   <label htmlFor="login-password">Password</label>
                   <div className="password-input">
@@ -605,13 +656,37 @@ export function AuthGate({ children }) {
                       {showPassword ? "Hide" : "Show"}
                     </button>
                   </div>
-                  <button type="submit" className="primary" disabled={busy}>
+                  <button
+                    type="submit"
+                    className="primary"
+                    disabled={busy || signInLocked}
+                  >
                     {busy ? "Signing in…" : "Sign in"}
                     <ArrowRight />
                   </button>
-                  <p className="helper">
-                    Need access or a password reset? Contact your preview
-                    administrator. Passwords are never stored in this app.
+                  <div className="account-links">
+                    <button
+                      type="button"
+                      onClick={() => setAccessMode("setup")}
+                    >
+                      Create your password
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAccessMode("reset")}
+                    >
+                      Forgot password?
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAccessMode("email-help")}
+                    >
+                      Forgot email?
+                    </button>
+                  </div>
+                  <p className="auth-note">
+                    10 failed attempts lock sign-in for 24 hours. Limits are
+                    enforced by the server.
                   </p>
                 </form>
               )}
@@ -649,7 +724,10 @@ export function AuthGate({ children }) {
                     maxLength={254}
                     value={email}
                     disabled={stage === "code" || busy}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setSignInLocked(false);
+                    }}
                   />
                   {stage === "code" && (
                     <>

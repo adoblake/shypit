@@ -12,6 +12,16 @@ Captured from the running app in Chromium. Business and carrier navigation now c
 
 These show the email/password preview entrance and the chooser for explicitly approved company and carrier memberships. Real login remains blocked until the two Auth accounts and database memberships are provisioned. Workspace screenshots below use intercepted test responses and sample data; they are not proof of a connected live account.
 
+## Account setup and email recovery
+
+![Password setup on desktop](desktop-password-setup.png)
+
+![Password setup on mobile](mobile-password-setup.png)
+
+![Forgot email on mobile](mobile-email-recovery.png)
+
+These screens are implemented. Real delivery and backend lock enforcement require the activation steps in [the account-recovery guide](../account-recovery.md).
+
 ## Approved workspace chooser
 
 ![Desktop workspace chooser](desktop-workspace-choice.png)
