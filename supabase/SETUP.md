@@ -1,6 +1,6 @@
 # Activate invite-only Shypit access
 
-The code is ready to configure. Until activation, Pages shows a locked sign-in/setup screen. There is no demo password, local-storage authentication flag, or publicly accessible workspace dataset in the built site.
+The supplied public project settings are connected in code. Until provider/database activation, no private workspace can open; the sign-in screen may appear but successful live access is not yet verified. There is no demo password, local-storage authentication flag, or publicly accessible workspace dataset in the built site.
 
 ## Free-plan choice
 
@@ -43,6 +43,10 @@ To add another teammate to the same organization, insert a membership with their
 To revoke access, set their `memberships.active` to `false`. Database policies immediately deny subsequent reads/writes. The open app also checks membership every minute and when it becomes visible, but previously viewed information cannot be recalled from a user's memory or screenshots.
 
 ## 4. Connect GitHub Pages
+
+The supplied project URL and public publishable key are now recorded in `config/public-auth.json`. The default Pages build uses those public settings. The provider, schema, and memberships still require activation and live verification. These public identifiers grant no privileged database access; row-level policies remain the security boundary.
+
+To override the checked-in public settings for another project:
 
 In GitHub repository **Settings → Secrets and variables → Actions → Variables**, add:
 

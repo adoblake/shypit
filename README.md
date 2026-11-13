@@ -4,9 +4,9 @@ Responsive private freight workspace for businesses and carriers. React + Vite; 
 
 ## Access and setup
 
-**The app is locked until Supabase is configured.** There are no shared demo credentials or frontend-only access switches. Google sign-in is the default, with email codes optional. A verified identity must also have an active administrator-assigned membership before workspace data is loaded.
+**The public Supabase project settings are connected in code; provider and database activation are still required.** There are no shared demo credentials or frontend-only access switches. Google sign-in is the default, with email codes optional. A verified identity must also have an active administrator-assigned membership before workspace data is loaded.
 
-[Activate the free-plan auth integration](supabase/SETUP.md). Configuration requires a Supabase project, Google OAuth client, database schema, approved memberships, and two public GitHub repository variables. Privileged secrets stay out of the frontend.
+[Activate the free-plan auth integration](supabase/SETUP.md). Activation requires the Google OAuth client, database schema, and approved memberships in the supplied Supabase project. Public GitHub repository variables can override the checked-in project settings. Privileged secrets stay out of the frontend.
 
 ## Run
 

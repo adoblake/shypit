@@ -1,7 +1,8 @@
 import { defineConfig, loadEnv } from "vite";
+import publicAuth from "./config/public-auth.json";
 export default defineConfig(({ mode }) => {
   const env = { ...loadEnv(mode, process.cwd(), "VITE_"), ...process.env };
-  const key = env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const key = env.VITE_SUPABASE_PUBLISHABLE_KEY || publicAuth.publicKey;
   if (key) {
     let valid = key.startsWith("sb_publishable_");
     if (!valid)
@@ -16,9 +17,11 @@ export default defineConfig(({ mode }) => {
       );
   }
   const authConfig = JSON.stringify({
-    url: env.VITE_SUPABASE_URL || "",
-    publicKey: env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
-    emailOtpEnabled: env.VITE_ENABLE_EMAIL_OTP === "true",
+    url: env.VITE_SUPABASE_URL || publicAuth.url,
+    publicKey: key,
+    emailOtpEnabled: env.VITE_ENABLE_EMAIL_OTP
+      ? env.VITE_ENABLE_EMAIL_OTP === "true"
+      : publicAuth.emailOtpEnabled,
   });
   return {
     base: "./",
