@@ -1460,3 +1460,13 @@ footer {
 footer .brand-lockup {
   width: 150px;
 }
+.workspace-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+.workspace-actions .text-button {
+  width: auto;
+  min-height: 44px;
+}

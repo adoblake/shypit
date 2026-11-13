@@ -581,11 +581,39 @@ export function AuthGate({ children }) {
               Switch workspace
             </button>
           )}
+          {account.role !== "admin" &&
+            memberships.some((member) => member.role === "admin") && (
+              <button
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  await queue.current;
+                  if (!token.current || !accountRef.current) {
+                    setBusy(false);
+                    return;
+                  }
+                  await openWorkspace(
+                    memberships.find((member) => member.role === "admin"),
+                    {
+                      id: accountRef.current.userId,
+                      email: accountRef.current.email,
+                    },
+                  );
+                }}
+              >
+                Admin Login
+              </button>
+            )}
           <button onClick={() => signOut()}>
             <SignOut size={18} />
             Sign out
           </button>
         </div>
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
         {account.role === "admin" ? (
           <Admin
             request={adminRequest}
@@ -690,34 +718,52 @@ export function AuthGate({ children }) {
               <p className="muted">
                 Only workspaces assigned to your account are available.
               </p>
-              {memberships.map((member) => (
-                <button
-                  className="workspace-choice"
-                  key={member.workspace_id}
-                  onClick={() => openWorkspace(member, pendingUser)}
-                  disabled={busy}
-                >
-                  <span>
-                    <strong>
-                      {member.role === "admin"
-                        ? "Admin workspace"
-                        : member.role === "business"
+              {memberships
+                .filter((member) => member.role !== "admin")
+                .map((member) => (
+                  <button
+                    className="workspace-choice"
+                    key={member.workspace_id}
+                    onClick={() => openWorkspace(member, pendingUser)}
+                    disabled={busy}
+                  >
+                    <span>
+                      <strong>
+                        {member.role === "business"
                           ? "Company workspace"
                           : "Carrier / LLC workspace"}
-                    </strong>
-                    <small>{member.display_name}</small>
-                  </span>
-                  <ArrowRight />
-                </button>
-              ))}
+                      </strong>
+                      <small>{member.display_name}</small>
+                    </span>
+                    <ArrowRight />
+                  </button>
+                ))}
               {error && (
                 <p className="error" role="alert">
                   {error}
                 </p>
               )}
-              <button className="text-button" onClick={() => signOut()}>
-                Sign out
-              </button>
+              <div className="workspace-actions">
+                {memberships
+                  .filter((member) => member.role === "admin")
+                  .map((member) => (
+                    <button
+                      key={member.workspace_id}
+                      className="text-button"
+                      disabled={busy}
+                      onClick={() => openWorkspace(member, pendingUser)}
+                    >
+                      Admin Login
+                    </button>
+                  ))}
+                <button
+                  className="text-button"
+                  disabled={busy}
+                  onClick={() => signOut()}
+                >
+                  Sign out
+                </button>
+              </div>
             </div>
           ) : configured === null ? (
             <p role="status">Checking sign-in availability…</p>

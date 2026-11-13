@@ -41,7 +41,8 @@ test("owner can review pilot and confirm scoped admin changes", async ({
   });
   await page.goto("/");
   await passwordSignIn(page);
-  await page.getByRole("button", { name: "Admin workspace" }).click();
+  await page.getByRole("button", { name: "Company workspace" }).click();
+  await page.getByRole("button", { name: "Admin Login" }).click();
   await expect(
     page.getByRole("heading", { name: "Keep good work moving." }),
   ).toBeVisible();
@@ -93,7 +94,7 @@ test("limited admin sees only granted sections and loses access when revoked", a
   });
   await page.goto("/");
   await passwordSignIn(page);
-  await page.getByRole("button", { name: "Admin workspace" }).click();
+  await page.getByRole("button", { name: "Admin Login" }).click();
   await expect(
     page.getByRole("button", { name: "People & permissions" }),
   ).toHaveCount(0);
