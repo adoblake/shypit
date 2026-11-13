@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { usLocations, connecticutPackage } from "./nationwide";
 import { packageStatuses, intakePackages, companyUpdate } from "./tracking";
 const blank = {
   number: "",
@@ -10,7 +11,12 @@ const blank = {
   to: "",
   eta: "",
 };
-export default function Tracking({ packages, setPackages, shipments }) {
+export default function Tracking({
+  packages,
+  setPackages,
+  shipments,
+  onFreight,
+}) {
   const [draft, setDraft] = useState(blank),
     [mode, setMode] = useState("Single package"),
     [bulk, setBulk] = useState(""),
@@ -23,7 +29,7 @@ export default function Tracking({ packages, setPackages, shipments }) {
   const visible = packages.filter(
     (p) =>
       (filter === "All statuses" || p.status === filter) &&
-      `${p.number} ${p.company} ${p.reference} ${p.shipment} ${p.carrier}`
+      `${p.number} ${p.company} ${p.reference} ${p.shipment} ${p.carrier} ${p.from} ${p.to}`
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
@@ -100,6 +106,7 @@ export default function Tracking({ packages, setPackages, shipments }) {
       {label}
       <input
         type={type}
+        list={["from", "to"].includes(key) ? "us-package-locations" : undefined}
         required={["number", "company", "from", "to"].includes(key)}
         maxLength={key === "number" ? 100 : 200}
         value={draft[key]}
@@ -119,6 +126,63 @@ export default function Tracking({ packages, setPackages, shipments }) {
         </div>
         <span className="status">Manual tracking demo</span>
       </div>
+      <datalist id="us-package-locations">
+        {usLocations.map((location) => (
+          <option key={location} value={location} />
+        ))}
+      </datalist>
+      <section className="national-intro" aria-label="Shipping test guide">
+        <p className="eyebrow">PARTNER TEST DRIVE · PACKAGES + FREIGHT</p>
+        <h2>Start in Connecticut. Ship across the U.S.</h2>
+        <p>
+          Try any U.S. origin and destination. Locations in all 50 states, DC,
+          and territories can be entered; actual carrier service is not verified
+          by this demo.
+        </p>
+        <ol>
+          <li>
+            Open the Connecticut sample or add a package using a tracking number
+            or scanner.
+          </li>
+          <li>
+            Record pickup, an in-transit location, then delivery or an
+            exception.
+          </li>
+          <li>Preview the company update and download the travel report.</li>
+          <li>
+            Switch to freight to create a pallet shipment, review a demo
+            booking, or test a driver pickup and delivery.
+          </li>
+        </ol>
+        <div className="national-actions">
+          <button
+            className="small-button"
+            onClick={() => {
+              setPackages((all) =>
+                all.some((p) => p.id === connecticutPackage.id)
+                  ? all
+                  : [connecticutPackage, ...all],
+              );
+              setSelected(connecticutPackage.id);
+              setFilter("All statuses");
+              setQuery("");
+              setCompanyView(false);
+              setMessage(
+                "Connecticut sample opened. Scroll to Package details to record its next handoff.",
+              );
+            }}
+          >
+            Open Connecticut test package
+          </button>
+          <button className="small-button" onClick={onFreight}>
+            Test freight shipping
+          </button>
+        </div>
+        <p className="muted">
+          Each tester has separate browser data. This link opens the same demo,
+          not shared shipments. Use sample information.
+        </p>
+      </section>
       <div className="tms-metrics">
         {[
           ["Total packages", packages.length],
@@ -332,7 +396,9 @@ export default function Tracking({ packages, setPackages, shipments }) {
                       {e.status} · {e.location}
                     </strong>
                     <time dateTime={e.at}>
-                      {new Date(e.at).toLocaleString()}
+                      {new Date(e.at).toLocaleString(undefined, {
+                        timeZoneName: "short",
+                      })}
                     </time>
                     <p>{e.note}</p>
                   </li>

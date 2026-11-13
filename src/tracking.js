@@ -112,7 +112,7 @@ export function companyUpdate(p) {
     "",
     ...p.events.map(
       (e) =>
-        `${new Date(e.at).toLocaleString()} · ${e.status} · ${e.location}\n${e.note}`,
+        `${new Date(e.at).toLocaleString(undefined, { timeZoneName: "short" })} · ${e.status} · ${e.location}\n${e.note}`,
     ),
     "",
     "Demo report: manually recorded updates; no live carrier connection.",

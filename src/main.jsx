@@ -19,6 +19,7 @@ import {
 import { initialShipments, loads } from "./data";
 import "./styles.css";
 import Tracking from "./Tracking";
+import { usLocations, nationalShipments } from "./nationwide";
 import { packageKey, samplePackages } from "./tracking";
 const money = (n) =>
   new Intl.NumberFormat("en-US", {
@@ -77,7 +78,11 @@ function Route({ item }) {
 }
 function App() {
   const [role, setRole] = useState("business"),
-    [page, setPage] = useState("Shipments"),
+    [page, setPage] = useState(
+      new URLSearchParams(window.location.search).get("view") === "tracking"
+        ? "Package tracking"
+        : "Shipments",
+    ),
     [shipments, setShipments] = useSaved(
       "shypit.shipments.v1",
       initialShipments,
@@ -256,6 +261,7 @@ function App() {
           packages={packages}
           setPackages={setPackages}
           shipments={shipments}
+          onFreight={() => setPage("Shipments")}
         />
       ) : role === "business" && page === "Shipments" ? (
         <main className="workspace">
@@ -265,12 +271,41 @@ function App() {
                 <p className="eyebrow">YOUR SHIPPING WORKSPACE</p>
                 <h1>Keep your freight moving.</h1>
                 <p className="muted subtitle">
-                  One place for every mile ahead.
+                  Plan U.S. routes from Connecticut to the West Coast and
+                  beyond. All rates and carrier availability are illustrative.
                 </p>
               </div>
               <button className="small-button" onClick={() => setModal("new")}>
                 <Plus />
                 New shipment
+              </button>
+            </div>
+            <div className="national-intro">
+              <strong>U.S. shipping review</strong>
+              <p>
+                Create a freight shipment between any U.S. locations, or track
+                individual packages and carrier handoffs.
+              </p>
+              <button
+                className="small-button"
+                onClick={() => setPage("Package tracking")}
+              >
+                Test package shipping
+              </button>
+              <button
+                className="small-button"
+                onClick={() => {
+                  setShipments((all) => [
+                    ...all,
+                    ...nationalShipments.filter(
+                      (s) => !all.some((p) => p.id === s.id),
+                    ),
+                  ]);
+                  setSelected("SHP-US-CT");
+                  revealDetails();
+                }}
+              >
+                Explore Connecticut freight
               </button>
             </div>
             <div className="shipment-table">
@@ -927,8 +962,16 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
       <p className="eyebrow">LET’S GET IT MOVING</p>
       <h2 id="modal-title">{repeat ? "Repeat a route" : "New shipment"}</h2>
       <p className="helper">
-        Demo quotes use a fixed sample rate; route pricing is not connected.
+        Enter any U.S. city and state, DC, or territory. Suggestions are
+        optional. Demo quotes use a fixed sample rate; route pricing and carrier
+        availability are not connected. Alaska, Hawaii and territory service
+        requires carrier confirmation.
       </p>
+      <datalist id="us-shipment-locations">
+        {usLocations.map((location) => (
+          <option key={location} value={location} />
+        ))}
+      </datalist>
       <div className="form-grid">
         <label>
           Pickup location
@@ -936,7 +979,8 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
             required
             name="from"
             defaultValue={repeat?.from}
-            placeholder="City, state"
+            placeholder="City, state (e.g. Hartford, CT)"
+            list="us-shipment-locations"
             maxLength={80}
           />
         </label>
@@ -946,7 +990,8 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
             required
             name="to"
             defaultValue={repeat?.to}
-            placeholder="City, state"
+            placeholder="City, state (e.g. Hartford, CT)"
+            list="us-shipment-locations"
             maxLength={80}
           />
         </label>

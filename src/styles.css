@@ -1112,3 +1112,28 @@ dialog[open] {
     flex-wrap: wrap;
   }
 }
+.national-intro {
+  background: #edf7f5;
+  border: 1px solid #b9d9d3;
+  border-radius: 12px;
+  padding: 22px;
+  margin: 24px 0;
+  line-height: 1.6;
+}
+.national-intro h2 {
+  margin-bottom: 12px;
+}
+.national-intro ol {
+  padding-left: 22px;
+}
+.national-intro p:last-child {
+  margin-bottom: 0;
+}
+.national-intro .small-button {
+  margin: 6px 10px 6px 0;
+}
+.national-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

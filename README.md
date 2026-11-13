@@ -52,3 +52,7 @@ Add authenticated business/carrier accounts and server-side authorization; a dat
 ## Package tracking / TMS
 
 Business navigation now includes **Package tracking**: manual/scanner intake, generated package numbers, tab-separated bulk intake, carrier-specific duplicate detection, shipment linkage, a searchable status queue, travel-event history, and downloadable company updates. Records remain in this browser only. Live carrier syncing, shared company access and email/SMS delivery are not connected. See [the TMS guide and live integration plan](docs/tms.md).
+
+## Nationwide partner review
+
+[Open the shipping test drive](https://adoblake.github.io/shypit/?view=tracking) or [freight workspace](https://adoblake.github.io/shypit/). Nationwide location suggestions cover all 50 states, DC and territories, with free-text US locations supported. Sample lanes now include Connecticut, the Midwest, Texas, and coast-to-coast freight. The **Open Connecticut test package** and **Explore Connecticut freight** buttons work for browsers that already have earlier demo data. See [partner test steps](docs/partner-test.md). Nationwide demo intake is not verified carrier coverage; pricing remains illustrative and records are separate on each device.
