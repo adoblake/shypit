@@ -1,6 +1,6 @@
 # Shypit partner test drive
 
-Open the public review demo at https://adoblake.github.io/shypit/?view=tracking . This link opens the package workspace; https://adoblake.github.io/shypit/ opens freight shipments. No login is required. Use fictional data: each browser has its own locally saved records, and the partners cannot see each other's changes.
+Open the private shipping workspace at https://adoblake.github.io/shypit/?view=tracking . This link opens the package workspace; https://adoblake.github.io/shypit/ opens freight shipments. Sign-in configuration and approved business membership are required. Members assigned to the same business workspace share saved records. Use fictional data. See ../supabase/SETUP.md for activation.
 
 ## Packages
 
@@ -14,7 +14,7 @@ Open the public review demo at https://adoblake.github.io/shypit/?view=tracking 
 1. Click **Test freight shipping**, then **Explore Connecticut freight** for Hartford → Phoenix. Compare other sample lanes: New Haven → Boston, Chicago → Dallas, Seattle → Miami.
 2. Create a new shipment using any US city/state, DC or territory. The location suggestions cover all 50 states plus DC and territories but do not restrict free-text locations. Try a Connecticut-to-Arizona route with your own sample pallet count and weight.
 3. Review and confirm a demo booking. Every new route uses the same illustrative rate; it is not a nationwide quote or a carrier commitment.
-4. Switch Account view to Driver. Search Hartford to review a Connecticut pickup, accept the sample job, confirm pickup, attach a proof filename and confirm delivery. Freight jobs and business bookings still use separate demo records; accepting a driver load does not dispatch a business shipment.
+4. Sign out and sign in with a separately approved carrier account (the assigned role cannot be switched in the UI). Search Hartford to review a Connecticut pickup, accept the sample job, confirm pickup, attach a proof filename and confirm delivery. Freight jobs and business bookings still use separate demo records; accepting a driver load does not dispatch a business shipment.
 
 ## Feedback to collect
 
@@ -24,4 +24,4 @@ Open the public review demo at https://adoblake.github.io/shypit/?view=tracking 
 - Who owns each handoff: Shypit, a partner driver, or an external carrier?
 - Which carriers, notification channels, proof requirements and real service areas matter for a pilot?
 
-The demo accepts nationwide routes. It does not verify carrier coverage, price routes, purchase labels, dispatch shipments, provide GPS, synchronize between testers or deliver notifications. Alaska, Hawaii and territory services require carrier-specific confirmation. See tms.md for the live service plan.
+The demo accepts nationwide routes. It does not verify carrier coverage, price routes, purchase labels, dispatch shipments, provide GPS or deliver notifications. Workspace data synchronizes only between authorized members of the same organization. Alaska, Hawaii and territory services require carrier-specific confirmation. See tms.md for the live service plan.

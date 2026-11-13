@@ -1,6 +1,16 @@
 # Design review
 
-Captured from the running app in Chromium. Switch between Business and Driver in the account selector to explore both journeys. Rates, dates, carrier profiles, bookings, and payouts are illustrative.
+Captured from the running app in Chromium. Business and carrier navigation now comes from administrator-assigned membership; there is no public role selector. Rates, dates, carrier profiles, bookings, and payouts are illustrative.
+
+## Desktop sign-in
+
+![Desktop sign-in](desktop-login.png)
+
+## Mobile sign-in
+
+![Mobile sign-in](mobile-login.png)
+
+These show the configured Google sign-in view. The deployed app remains locked at setup until its provider settings are connected. Workspace screenshots below use intercepted test responses and sample data; they are not proof of a connected live account.
 
 ## Desktop business workspace
 

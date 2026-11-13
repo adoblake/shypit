@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "playwright test",
-    "test:production": "node scripts/check-production.mjs"
+    "test:production": "node scripts/check-production.mjs",
+    "test:policies": "node scripts/test-access-policies.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",
@@ -17,6 +18,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@playwright/test": "^1.56.0",
     "prettier": "^3.10.1",
     "vite": "^6.0.0"

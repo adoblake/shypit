@@ -1,58 +1,58 @@
 # Shypit
 
-Responsive freight marketplace foundation for businesses and drivers. Built with React and Vite, following the selected navy/teal design with a shipment list and booking panel. Mobile has stacked workflows and touch-friendly controls; desktop keeps operational context beside the task.
+Responsive private freight workspace for businesses and carriers. React + Vite; the approved navy/teal design with desktop shipment/detail panels and mobile task flows.
 
-## Preview the design
+## Access and setup
 
-[Open the desktop and mobile screenshot gallery](docs/review/README.md). For an interactive review site, use the GitHub Pages workflow described below.
+**The app is locked until Supabase is configured.** There are no shared demo credentials or frontend-only access switches. Google sign-in is the default, with email codes optional. A verified identity must also have an active administrator-assigned membership before workspace data is loaded.
 
-## Run locally
+[Activate the free-plan auth integration](supabase/SETUP.md). Configuration requires a Supabase project, Google OAuth client, database schema, approved memberships, and two public GitHub repository variables. Privileged secrets stay out of the frontend.
 
-Node.js 24 and npm 11 are used in development.
+## Run
+
+Node 24 and npm 11:
 
 ```sh
 npm ci
+cp .env.example .env.local
+# Configure public project settings in .env.local; never put privileged keys here.
 npm run dev -- --host 0.0.0.0
 npm run build
 ```
 
-## Browser checks
+Without settings, the app deliberately shows the locked setup screen. Normal sign-in keeps tokens in memory, requires re-authentication after refresh, and expires after 15 minutes. Configure the provider's JWT lifetime accordingly as documented in the setup guide.
+
+## Verification
 
 ```sh
 npx playwright install chromium
 npm test
+npm run test:policies
 npm run build
 npm run test:production
 ```
 
-Local tests use `/usr/bin/chromium`. On a different machine, set `CI=1` to use Playwright's installed browser. Checks cover desktop (1440px) and mobile (390px), shipment validation/booking, persistent demo data, load search, job acceptance, pickup, delivery proof, earnings, navigation, and horizontal overflow.
+Local tests use `/usr/bin/chromium`; `CI=1` uses Playwright's installed browser. Desktop and mobile browser tests intercept the identity API in the test runner—there is no test sign-in bypass in shipped code. Policy tests run real PostgreSQL RLS and trigger logic via PGlite with a minimal `auth.uid()` stand-in. Real-provider activation still requires the checks in the setup guide.
 
 ## Included workflows
 
-- **Business:** create shipment drafts; choose Standard/Priority; review transparent illustrative prices; confirm demo bookings; inspect shipment progress; repeat routes; browse sample carrier profiles; review billing activity.
-- **Driver:** search loads by route/city and equipment; inspect payout, deadhead and loaded miles; accept demo jobs; confirm pickup; attach a proof filename; confirm delivery; view pending earnings; inspect document requirements.
-- Local storage retains sample shipments and jobs on the same browser/device. Reset demo clears this app's data only.
+- **Business:** create shipment drafts, review illustrative service prices, book sample shipments, inspect status, repeat routes, view sample carrier profiles and billing activity.
+- **Carrier:** search sample loads by route/equipment, inspect payout and mileage, accept a sample job, confirm pickup, record proof filename, complete delivery, view pending sample earnings.
+- Assigned roles replace the public role switch. Data loads from the authorized Supabase workspace; no freight dataset or bearer token is stored in local storage. Legacy demo storage is removed on startup.
+- Workspace saves use revision checks; failed or conflicting saves lock the app and require reloading through sign-in.
 
 ## GitHub review
 
-The `Build and browser checks` workflow builds and tests pushes, and uploads a `shypit-review` artifact containing the built site and desktop/mobile screenshots.
+Pushes to `feat/shypit-foundation` run **Publish review site**, which builds and checks the locked production entrypoint at `/shypit/` before deployment. Pages must use **GitHub Actions** as its source. Missing auth settings result in a locked site, not an accessible demo.
 
-For a review website, enable **Settings → Pages → Source: GitHub Actions**, then run **Publish review site** on the branch containing this code. Pushes to `feat/shypit-foundation` also trigger this workflow. The workflow runs a production browser smoke test at `/shypit/` before publishing the demo, not a production transportation service. No live deployment is performed by local setup. Vite uses relative asset paths so builds work under `/shypit/` regardless of where they were built.
+[Review screenshots](docs/review/README.md). Existing workspace screenshots are sample views; live access now requires assigned membership. For Google-only sign-in no email sending is required. Nothing in this repository buys a subscription or activates paid billing.
 
-An empty repository may need its first pushed branch selected as the default branch in GitHub before manual workflows appear. The foundation branch can be reviewed directly without merging into a production branch.
+## Pilot limitations
 
-## Explicit demo boundaries
+No real freight dispatch, location tracking, carrier authority verification, billing, or payouts are connected. Prices and dates are illustrative. Proof input saves only a filename to the private workspace; files are not uploaded. Businesses and carrier workspaces are isolated pilot journeys, not a shared dispatch backend. The JSON workspace model needs normalization and audited transactional server operations before real bookings. Do not treat frontend role visibility as an authorization boundary: database policies enforce access.
 
-There is no login, backend, cross-device sync, live carrier verification, live tracking, matching engine, payment processing, email, or freight dispatch. Sample dates are anchored to the design brief, not availability. Quotes are fixed sample prices, not route calculations. Driver payout estimates include empty miles but do not subtract costs. Document inputs save only the filename locally; nothing is uploaded. Do not enter personal, confidential, payment, or carrier credential data. Business and driver datasets demonstrate separate journeys and are not a shared dispatch backend.
+## Nationwide package tracking and partner review
 
-## Next production steps
+Business navigation includes **Package tracking** for number/scanner/bulk intake, shipment linkage, travel history, exceptions and downloadable company reports. Package records save to the authenticated business workspace; live carrier synchronization and email/SMS are not connected. Apply the updated schema so business members can save packages.
 
-Add authenticated business/carrier accounts and server-side authorization; a database with audited shipment/job transitions and atomic load reservation; carrier authority/insurance verification; shipment eligibility and service terms; route/rate APIs; secure proof storage; billing/subscriptions and payout integrations; real tracking with consent; notifications; cancellation/dispute and waiting-time policies. Validate these with pilot businesses and carriers before real freight bookings.
-
-## Package tracking / TMS
-
-Business navigation now includes **Package tracking**: manual/scanner intake, generated package numbers, tab-separated bulk intake, carrier-specific duplicate detection, shipment linkage, a searchable status queue, travel-event history, and downloadable company updates. Records remain in this browser only. Live carrier syncing, shared company access and email/SMS delivery are not connected. See [the TMS guide and live integration plan](docs/tms.md).
-
-## Nationwide partner review
-
-[Open the shipping test drive](https://adoblake.github.io/shypit/?view=tracking) or [freight workspace](https://adoblake.github.io/shypit/). Nationwide location suggestions cover all 50 states, DC and territories, with free-text US locations supported. Sample lanes now include Connecticut, the Midwest, Texas, and coast-to-coast freight. The **Open Connecticut test package** and **Explore Connecticut freight** buttons work for browsers that already have earlier demo data. See [partner test steps](docs/partner-test.md). Nationwide demo intake is not verified carrier coverage; pricing remains illustrative and records are separate on each device.
+The partner link is https://adoblake.github.io/shypit/?view=tracking and requires configured sign-in plus approved business membership. Location suggestions cover all 50 states, DC and territories. **Open Connecticut test package** and **Explore Connecticut freight** add missing sample records without overwriting existing work. Nationwide route entry does not verify carrier coverage; rates remain illustrative. See [partner testing](docs/partner-test.md) and [TMS integration](docs/tms.md).

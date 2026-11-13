@@ -1,4 +1,4 @@
-import { nationalShipments, nationalLoads } from "./nationwide";
+import { nationalShipments, nationalLoads } from "../../src/nationwide.js";
 export const initialShipments = [
   {
     id: "SHP-1042",

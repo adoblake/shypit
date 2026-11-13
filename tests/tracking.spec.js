@@ -1,8 +1,11 @@
+import { installAuthMock, signIn } from "./fixtures/auth-mock.js";
 import { test, expect } from "@playwright/test";
 test("package intake, duplicates, travel history, company export and persistence", async ({
   page,
 }) => {
+  await installAuthMock(page);
   await page.goto("/");
+  await signIn(page);
   await page
     .getByRole("button", { name: "Package tracking", exact: true })
     .click();
@@ -25,7 +28,9 @@ test("package intake, duplicates, travel history, company export and persistence
     .fill("Weather delay. Awaiting revised departure.");
   await page.getByRole("button", { name: "Save travel update" }).click();
   await expect(page.getByText("Exception · Blythe, CA")).toBeVisible();
+  await expect(page.getByText("Saved securely")).toBeVisible();
   await page.reload();
+  await signIn(page);
   await page
     .getByRole("button", { name: "Package tracking", exact: true })
     .click();
@@ -50,7 +55,9 @@ test("package intake, duplicates, travel history, company export and persistence
 test("bulk intake accepts valid rows and reports duplicate and invalid rows", async ({
   page,
 }) => {
+  await installAuthMock(page);
   await page.goto("/");
+  await signIn(page);
   await page
     .getByRole("button", { name: "Package tracking", exact: true })
     .click();
@@ -76,7 +83,9 @@ test("bulk intake accepts valid rows and reports duplicate and invalid rows", as
 test("partner link supports Connecticut packages and nationwide freight", async ({
   page,
 }) => {
+  await installAuthMock(page);
   await page.goto("/?view=tracking");
+  await signIn(page);
   await expect(
     page.getByRole("heading", {
       name: "Start in Connecticut. Ship across the U.S.",

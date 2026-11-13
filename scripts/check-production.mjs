@@ -57,25 +57,33 @@ try {
     });
     await page.goto(`http://127.0.0.1:${server.address().port}/shypit/`);
     await page
-      .getByRole("heading", { name: "Keep your freight moving." })
+      .getByRole("heading", { name: "Sign in to your workspace." })
       .waitFor({ timeout: 10000 });
-    await page.getByRole("button", { name: "Review & book" }).click();
-    await page.getByRole("button", { name: "Confirm demo booking" }).click();
-    await page
-      .getByRole("combobox", { name: "Account view" })
-      .selectOption("driver");
-    await page
-      .getByRole("heading", { name: "Find your next good mile." })
-      .waitFor();
-    await page.getByRole("button", { name: "Review load" }).click();
-    await page.getByRole("button", { name: "Accept demo load" }).click();
-    await page.getByRole("button", { name: "Confirm pickup" }).waitFor();
+    assert.equal(
+      await page.getByRole("navigation").count(),
+      0,
+      "Logged-out visitors must not see workspace navigation",
+    );
+    assert.equal(
+      await page
+        .getByRole("button", { name: "New shipment", exact: true })
+        .count(),
+      0,
+      "No public shipment access",
+    );
+    const config = JSON.parse(await readFile("dist/auth-config.json", "utf8"));
+    if (!config.url || !config.publicKey)
+      await page.getByText("Sign-in is being set up.").waitFor();
+    else
+      await page
+        .getByRole("button", { name: "Continue with Google" })
+        .waitFor();
     assert.deepEqual(
       errors,
       [],
       "Production page must not have failed assets or runtime errors",
     );
-    console.log(`Production /shypit/ smoke passed: ${viewport.width}px`);
+    console.log(`Locked production /shypit/ smoke passed: ${viewport.width}px`);
     await page.close();
   }
 } finally {

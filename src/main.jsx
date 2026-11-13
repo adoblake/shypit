@@ -16,11 +16,11 @@ import {
   Plus,
   X,
 } from "@phosphor-icons/react";
-import { initialShipments, loads } from "./data";
+import { AuthGate, useWorkspaceField } from "./auth";
 import "./styles.css";
 import Tracking from "./Tracking";
 import { usLocations, nationalShipments } from "./nationwide";
-import { packageKey, samplePackages } from "./tracking";
+
 const money = (n) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -32,21 +32,6 @@ const date = (d) =>
     month: "short",
     day: "numeric",
   });
-function useSaved(key, initial) {
-  const [value, set] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(key)) ?? initial;
-    } catch {
-      return initial;
-    }
-  });
-  useEffect(() => {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch {}
-  }, [key, value]);
-  return [value, set];
-}
 const city = (s) => s.split(",")[0];
 function Status({ value }) {
   const Icon =
@@ -76,19 +61,20 @@ function Route({ item }) {
     </div>
   );
 }
-function App() {
-  const [role, setRole] = useState("business"),
-    [page, setPage] = useState(
-      new URLSearchParams(window.location.search).get("view") === "tracking"
-        ? "Package tracking"
-        : "Shipments",
+function App({ account, initialData }) {
+  const role = account.role;
+  const initialShipments = initialData.shipments;
+  const loads = initialData.loads;
+  const [page, setPage] = useState(
+      role === "business"
+        ? new URLSearchParams(window.location.search).get("view") === "tracking"
+          ? "Package tracking"
+          : "Shipments"
+        : "Find loads",
     ),
-    [shipments, setShipments] = useSaved(
-      "shypit.shipments.v1",
-      initialShipments,
-    ),
-    [packages, setPackages] = useSaved(packageKey, samplePackages),
-    [jobs, setJobs] = useSaved("shypit.jobs.v1", []),
+    [shipments, setShipments] = useWorkspaceField("shipments"),
+    [jobs, setJobs] = useWorkspaceField("jobs"),
+    [packages, setPackages] = useWorkspaceField("packages"),
     [selected, setSelected] = useState(initialShipments[0].id),
     [selectedLoad, setSelectedLoad] = useState(loads[0].id),
     [service, setService] = useState("Standard"),
@@ -152,11 +138,6 @@ function App() {
   const flash = (t) => {
     setNotice(t);
     setTimeout(() => setNotice(""), 5000);
-  };
-  const changeRole = (r) => {
-    setRole(r);
-    setPage(r === "business" ? "Shipments" : "Find loads");
-    setModal(null);
   };
   function book() {
     setShipments((all) =>
@@ -224,24 +205,15 @@ function App() {
             </button>
           ))}
         </nav>
-        <label className="role">
+        <div className="role">
           <Buildings size={21} />
-          <span className="sr-only">Account view</span>
-          <select
-            aria-label="Account view"
-            value={role}
-            onChange={(e) => changeRole(e.target.value)}
-          >
-            <option value="business">Business — Acme Supply Co.</option>
-            <option value="driver">Driver — Jordan Miller</option>
-          </select>
-        </label>
+          <span>{account.display_name || account.email}</span>
+        </div>
       </header>
       <div className="demo-bar">
         <Info size={16} />
         <span>
-          Interactive demo · Sample rates and dates · Changes saved on this
-          device only
+          Private pilot · Sample rates and dates · Workspace access restricted
         </span>
       </div>
       {notice && (
@@ -640,7 +612,8 @@ function App() {
                     </p>
                     {j.status === "In transit" && (
                       <label className="proof">
-                        Delivery document (filename saved locally; no upload)
+                        Delivery document (filename saved to workspace; no file
+                        upload)
                         <input
                           type="file"
                           accept="image/*,.pdf"
@@ -802,7 +775,7 @@ function App() {
       )}
       <footer>
         Shypit <span>Better together. Mile after mile.</span>
-        <button onClick={() => setModal("reset")}>Reset demo</button>
+        <span>Private workspace</span>
       </footer>
       {modal && (
         <div
@@ -890,28 +863,7 @@ function App() {
                   Accept demo load
                 </button>
               </>
-            ) : (
-              <>
-                <h2 id="modal-title">Reset this demo?</h2>
-                <p>
-                  This removes shipment, package, and job changes stored on this
-                  device.
-                </p>
-                <button
-                  className="primary"
-                  onClick={() => {
-                    setShipments(initialShipments);
-                    setJobs([]);
-                    setPackages(samplePackages);
-                    setSelected(initialShipments[0].id);
-                    setModal(null);
-                    flash("Demo reset.");
-                  }}
-                >
-                  Reset demo data
-                </button>
-              </>
-            )}
+            ) : null}
           </dialog>
         </div>
       )}
@@ -1050,4 +1002,6 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
     </form>
   );
 }
-createRoot(document.getElementById("root")).render(<App />);
+createRoot(document.getElementById("root")).render(
+  <AuthGate>{(props) => <App {...props} />}</AuthGate>,
+);

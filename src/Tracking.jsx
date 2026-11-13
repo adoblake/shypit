@@ -99,7 +99,7 @@ export default function Tracking({
       ),
     );
     e.currentTarget.reset();
-    setMessage("Travel update saved on this device.");
+    setMessage("Travel update recorded. Check the workspace save status.");
   }
   const field = (key, label, type = "text") => (
     <label>
@@ -179,8 +179,8 @@ export default function Tracking({
           </button>
         </div>
         <p className="muted">
-          Each tester has separate browser data. This link opens the same demo,
-          not shared shipments. Use sample information.
+          Members of the same approved business workspace share saved records.
+          Use sample information.
         </p>
       </section>
       <div className="tms-metrics">
@@ -207,9 +207,8 @@ export default function Tracking({
         ))}
       </div>
       <p className="helper">
-        Saved in this browser only. Carrier sync, shared company access, and
-        automatic notifications require a backend connection. Do not enter
-        confidential data.
+        Packages save to your authorized workspace. Live carrier sync and
+        automatic notifications are not connected. Use sample information.
       </p>
       {message && (
         <p role="status" className="tms-message">
