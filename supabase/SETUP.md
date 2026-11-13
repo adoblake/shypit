@@ -2,6 +2,10 @@
 
 The supplied public project settings are connected in code. Until provider/database activation, no private workspace can open; the sign-in screen may appear but successful live access is not yet verified. There is no demo password, local-storage authentication flag, or publicly accessible workspace dataset in the built site.
 
+## Private founder preview
+
+The current preview uses email/password, not Google. Follow [the founder access guide](../docs/preview-access.md) to create confirmed accounts and explicitly assign both workspaces. For this manually provisioned preview, existing confirmed users can sign in without an SMTP service. The Google and email-code sections below are optional alternatives.
+
 ## Free-plan choice
 
 Use a Supabase **Free** project and Google OAuth with basic identity scopes. This avoids SMS, paid SSO, and an SMTP dependency. No subscription or payment integration is installed by this app. Review current terms and limits at https://supabase.com/pricing and the Google OAuth console before enabling services; free projects have quotas and may pause when inactive. Do not upgrade or enable paid services for this pilot.
@@ -15,7 +19,7 @@ Email-code login is optional and off by default. Supabase's built-in sender is r
 3. Configure Auth's JWT expiry to **900 seconds**. Shypit does not retain refresh tokens or automatically extend sessions. Session memory is cleared on refresh, sign-out, expiry, or inactivity. A provider JWT can remain valid until its server-configured expiry; the frontend's inactivity timer is not a server revocation mechanism.
 4. In Auth URL configuration, set Site URL and the exact redirect allowlist entry to `https://adoblake.github.io/shypit/`. Add `http://localhost:5173/` only if you need local development. Avoid wildcard redirect entries.
 
-## 2. Enable Google sign-in
+## 2. Optional: enable Google sign-in
 
 1. Create a Google Cloud OAuth client for a web application. Configure its consent screen using only basic email/profile identity scopes. Start with your own accounts as test users; check Google's publishing requirements before inviting wider users.
 2. Use the callback URL shown in Supabase's Google provider settings (normally `https://PROJECT_REF.supabase.co/auth/v1/callback`) as Google's authorized redirect URI.

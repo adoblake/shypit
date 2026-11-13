@@ -15,11 +15,12 @@ create table public.workspaces (
  )
 );
 create table public.memberships (
- user_id uuid primary key references auth.users(id) on delete cascade,
+ user_id uuid not null references auth.users(id) on delete cascade,
  workspace_id uuid not null,
  role text not null check (role in ('business','driver')),
  display_name text not null,
  active boolean not null default true,
+ primary key (user_id,workspace_id),
  foreign key (workspace_id,role) references public.workspaces(id,kind)
 );
 alter table public.workspaces enable row level security;

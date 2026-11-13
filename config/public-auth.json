@@ -1,5 +1,7 @@
 {
   "url": "https://mzztaucyapmwlnuiljsv.supabase.co",
   "publicKey": "sb_publishable_1_kYueCJKG1EomBWwVt4og_T6l-iVqv",
-  "emailOtpEnabled": false
+  "emailOtpEnabled": false,
+  "passwordEnabled": true,
+  "googleEnabled": false
 }

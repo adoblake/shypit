@@ -17,6 +17,8 @@ export default defineConfig(({ mode }) => {
       );
   }
   const authConfig = JSON.stringify({
+    passwordEnabled: publicAuth.passwordEnabled !== false,
+    googleEnabled: publicAuth.googleEnabled === true,
     url: env.VITE_SUPABASE_URL || publicAuth.url,
     publicKey: key,
     emailOtpEnabled: env.VITE_ENABLE_EMAIL_OTP

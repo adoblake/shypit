@@ -4,9 +4,15 @@ Responsive private freight workspace for businesses and carriers. React + Vite; 
 
 ## Access and setup
 
-**The public Supabase project settings are connected in code; provider and database activation are still required.** There are no shared demo credentials or frontend-only access switches. Google sign-in is the default, with email codes optional. A verified identity must also have an active administrator-assigned membership before workspace data is loaded.
+**The public Supabase project settings are connected in code; provider and database activation are still required.** There are no shared demo credentials or frontend-only access switches. Email/password is the private-preview entrance; Google and email codes are optional. A verified identity must also have an active administrator-assigned membership before workspace data is loaded.
 
 [Activate the free-plan auth integration](supabase/SETUP.md). Activation requires the Google OAuth client, database schema, and approved memberships in the supplied Supabase project. Public GitHub repository variables can override the checked-in project settings. Privileged secrets stay out of the frontend.
+
+## Founder preview
+
+[Set up private access for you and Ronald](docs/preview-access.md). Both founders can be explicitly assigned company and LLC-carrier workspaces; the app lists only server-approved memberships. Passwords are entered privately through Supabase and never committed here.
+
+[Watch the captioned good-case walkthrough](public/walkthrough/shypit-good-case.mp4). It uses fictional B2B shipper, customer and LLC-carrier data; dispatch handoff and payouts are simulated.
 
 ## Run
 

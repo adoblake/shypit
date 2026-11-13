@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "playwright test",
     "test:production": "node scripts/check-production.mjs",
-    "test:policies": "node scripts/test-access-policies.mjs"
+    "test:policies": "node scripts/test-access-policies.mjs && node scripts/test-preview-provisioning.mjs",
+    "record:walkthrough": "node scripts/record-good-case.mjs",
+    "encode:walkthrough": "node scripts/encode-walkthrough.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",

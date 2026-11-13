@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Shypit — A shipment, together</title>
+    <style>
+      body {
+        margin: 0;
+        background: #faf9f6;
+        color: #101d32;
+        font:
+          16px/1.65 system-ui,
+          sans-serif;
+      }
+      header {
+        background: #101d32;
+        padding: 18px 6%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      header a {
+        color: white;
+        text-decoration: none;
+      }
+      .brand {
+        font-size: 29px;
+        font-weight: 750;
+        letter-spacing: -1px;
+      }
+      main {
+        max-width: 1100px;
+        margin: auto;
+        padding: 38px 24px 60px;
+      }
+      h1 {
+        font-size: clamp(30px, 5vw, 45px);
+        line-height: 1.15;
+        letter-spacing: -1.4px;
+        margin: 10px 0 20px;
+      }
+      .eyebrow {
+        color: #087f78;
+        font-size: 12px;
+        letter-spacing: 1.4px;
+        font-weight: 700;
+      }
+      video {
+        display: block;
+        width: 100%;
+        height: auto;
+        background: #101d32;
+        border-radius: 10px;
+        margin: 26px 0 20px;
+      }
+      a {
+        color: #087f78;
+      }
+      .note {
+        color: #52646a;
+        font-size: 14px;
+        max-width: 800px;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 650;
+        padding: 20px 0;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+      ol {
+        max-width: 800px;
+        padding-left: 24px;
+      }
+      @media (max-width: 600px) {
+        header {
+          padding: 14px 22px;
+        }
+        main {
+          padding: 28px 20px;
+        }
+        .brand {
+          font-size: 26px;
+        }
+        header > a:last-child {
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="../">Shypit</a><a href="../">Back to sign-in</a>
+    </header>
+    <main>
+      <p class="eyebrow">GOOD-CASE SHIPMENT WALKTHROUGH</p>
+      <h1>
+        A small business.<br />An independent LLC.<br />One successful delivery.
+      </h1>
+      <p>
+        A 55-second, captioned preview of the company and carrier journeys,
+        including the carrier’s mobile experience.
+      </p>
+      <video
+        controls
+        playsinline
+        preload="metadata"
+        aria-label="Captioned sample shipment walkthrough"
+      >
+        <source src="shypit-good-case.mp4" type="video/mp4" />
+        Your browser cannot play this video.
+        <a href="shypit-good-case.mp4">Download the MP4</a>.
+      </video>
+      <p>
+        <a href="shypit-good-case.mp4" download>Download the walkthrough</a>
+      </p>
+      <p class="note">
+        Scripted preview with fictional accounts and sample freight.
+        Cross-company dispatch is simulated; no real shipment, proof upload, or
+        payment takes place. This video shows the intended good-case journey,
+        not a connected live dispatch service.
+      </p>
+      <details>
+        <summary>Read the walkthrough</summary>
+        <ol>
+          <li>
+            Cedar Supply Co. sells eight pallets of office organizers to Harbor
+            Office Goods. The company enters its shipment details, reviews the
+            illustrative $965 price, and confirms a demo booking.
+          </li>
+          <li>
+            An independent operator with Open Road Logistics LLC opens the
+            mobile carrier workspace, reviews the Phoenix–Los Angeles load, and
+            accepts the sample $920 payout.
+          </li>
+          <li>
+            The operator confirms pickup, records a delivery-proof filename,
+            completes delivery, and reviews pending sample earnings.
+          </li>
+          <li>
+            The video simulates the dispatch handoff. The company sees the
+            completed shipment and prepares a customer-facing tracking update
+            for its business customer.
+          </li>
+        </ol>
+      </details>
+    </main>
+  </body>
+</html>

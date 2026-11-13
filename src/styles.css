@@ -1306,3 +1306,49 @@ dialog[open] {
     min-height: 52px;
   }
 }
+.password-input {
+  position: relative;
+}
+.password-input input:not([type="radio"]) {
+  padding-right: 70px;
+}
+.password-input button {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  min-width: 56px;
+  min-height: 38px;
+  color: #087f78;
+  font-size: 12px;
+}
+.password-form .helper {
+  margin-bottom: 14px;
+}
+.workspace-choices {
+  margin-top: 24px;
+}
+.workspace-choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  text-align: left;
+  padding: 20px;
+  border: 1px solid #b4c9c5;
+  border-radius: 8px;
+  margin: 14px 0;
+  background: #e7f3f0;
+}
+.workspace-choice small {
+  display: block;
+  color: #536d69;
+  font-size: 13px;
+  margin-top: 7px;
+}
+.session-strip button {
+  margin-left: 0;
+}
+.session-strip button:first-of-type {
+  margin-left: auto;
+}

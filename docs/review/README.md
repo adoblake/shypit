@@ -10,7 +10,13 @@ Captured from the running app in Chromium. Business and carrier navigation now c
 
 ![Mobile sign-in](mobile-login.png)
 
-These show the configured Google sign-in view. The deployed app remains locked at setup until its provider settings are connected. Workspace screenshots below use intercepted test responses and sample data; they are not proof of a connected live account.
+These show the email/password preview entrance and the chooser for explicitly approved company and carrier memberships. Real login remains blocked until the two Auth accounts and database memberships are provisioned. Workspace screenshots below use intercepted test responses and sample data; they are not proof of a connected live account.
+
+## Approved workspace chooser
+
+![Desktop workspace chooser](desktop-workspace-choice.png)
+
+![Mobile workspace chooser](mobile-workspace-choice.png)
 
 ## Desktop business workspace
 

@@ -58,6 +58,10 @@ export function AuthGate({ children }) {
   const [config, setConfig] = useState(null),
     [configured, setConfigured] = useState(null),
     [stage, setStage] = useState("email"),
+    [password, setPassword] = useState(""),
+    [showPassword, setShowPassword] = useState(false),
+    [pendingUser, setPendingUser] = useState(null),
+    [memberships, setMemberships] = useState([]),
     [email, setEmail] = useState(""),
     [code, setCode] = useState(""),
     [busy, setBusy] = useState(false),
@@ -132,6 +136,10 @@ export function AuthGate({ children }) {
     accountRef.current = null;
     expires.current = 0;
     setAccount(null);
+    setPendingUser(null);
+    setMemberships([]);
+    setPassword("");
+    setShowPassword(false);
     setData(null);
     serverData.current = null;
     setStage("email");
@@ -180,6 +188,8 @@ export function AuthGate({ children }) {
         const rows = await api(
           "/rest/v1/memberships?select=workspace_id,role&user_id=eq." +
             encodeURIComponent(account.userId) +
+            "&workspace_id=eq." +
+            encodeURIComponent(account.workspace_id) +
             "&active=eq.true",
         );
         if (
@@ -237,29 +247,97 @@ export function AuthGate({ children }) {
       { access: session.access_token },
     );
     if (
-      members.length !== 1 ||
-      !["business", "driver"].includes(members[0].role)
+      !members.length ||
+      members.some((member) => !["business", "driver"].includes(member.role))
     )
       throw Error();
-    const member = members[0];
-    const rows = await api(
-      "/rest/v1/workspaces?select=id,data,revision&id=eq." +
-        encodeURIComponent(member.workspace_id),
-      { access: session.access_token },
-    );
-    if (rows.length !== 1 || !validData(rows[0].data)) throw Error();
     if (attempt !== epoch.current) return;
     token.current = session.access_token;
     expires.current = Math.min(
       Number(session.expires_at) * 1000 || Date.now() + 900000,
       Date.now() + 900000,
     );
-    revision.current = rows[0].revision;
-    serverData.current = rows[0].data;
-    accountRef.current = { ...member, userId: user.id, email: user.email };
-    setAccount(accountRef.current);
-    setData(rows[0].data);
-    setCode("");
+    setMemberships(members);
+    setPassword("");
+    setShowPassword(false);
+    if (members.length > 1) {
+      setPendingUser(user);
+      return;
+    }
+    await openWorkspace(members[0], user, attempt);
+  }
+  async function openWorkspace(member, user, attempt = epoch.current) {
+    setBusy(true);
+    setError("");
+    try {
+      const rows = await api(
+        "/rest/v1/workspaces?select=id,data,revision&id=eq." +
+          encodeURIComponent(member.workspace_id),
+        { access: token.current },
+      );
+      if (rows.length !== 1 || !validData(rows[0].data)) throw Error();
+      if (attempt !== epoch.current) return;
+      revision.current = rows[0].revision;
+      serverData.current = rows[0].data;
+      accountRef.current = { ...member, userId: user.id, email: user.email };
+      setAccount(accountRef.current);
+      setData(rows[0].data);
+      setCode("");
+      setPendingUser(null);
+    } catch {
+      if (attempt === epoch.current) {
+        setError(
+          "Unable to open this workspace. Your access may have changed.",
+        );
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function passwordSignIn(e) {
+    e.preventDefault();
+    if (busy || !configured) return;
+    setBusy(true);
+    setError("");
+    setMessage("");
+    const attempt = epoch.current;
+    try {
+      const session = await api("/auth/v1/token?grant_type=password", {
+        method: "POST",
+        access: null,
+        body: { email: email.trim().toLowerCase(), password },
+      });
+      await establishSession(session, attempt);
+    } catch {
+      setPassword("");
+      setShowPassword(false);
+      setError(
+        "Unable to sign in. Check your email and password, or ask your administrator to confirm preview access.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function switchWorkspace() {
+    setBusy(true);
+    await queue.current;
+    if (!token.current) {
+      setBusy(false);
+      return;
+    }
+    const session = {
+      access_token: token.current,
+      expires_at: expires.current / 1000,
+    };
+    setAccount(null);
+    setData(null);
+    try {
+      await establishSession(session, epoch.current);
+    } catch {
+      await signOut("Your access changed. Please sign in again.");
+    } finally {
+      setBusy(false);
+    }
   }
   async function verify(e) {
     e.preventDefault();
@@ -397,6 +475,11 @@ export function AuthGate({ children }) {
             {account.role === "business" ? "Business" : "Carrier"}
           </span>
           <span role="status">{saveState}</span>
+          {memberships.length > 1 && (
+            <button onClick={switchWorkspace} disabled={busy}>
+              Switch workspace
+            </button>
+          )}
           <button onClick={() => signOut()}>
             <SignOut size={18} />
             Sign out
@@ -434,12 +517,48 @@ export function AuthGate({ children }) {
             <LockKey size={30} />
           </span>
           <p className="eyebrow">WELCOME TO SHYPIT</p>
-          <h2>Sign in to your workspace.</h2>
+          <h2>
+            {pendingUser
+              ? "Choose your workspace."
+              : "Sign in to your workspace."}
+          </h2>
           <p className="muted">
             Use the email address invited by your business or carrier
             administrator.
           </p>
-          {configured === null ? (
+          {pendingUser ? (
+            <div className="workspace-choices">
+              <p className="muted">
+                Only workspaces assigned to your account are available.
+              </p>
+              {memberships.map((member) => (
+                <button
+                  className="workspace-choice"
+                  key={member.workspace_id}
+                  onClick={() => openWorkspace(member, pendingUser)}
+                  disabled={busy}
+                >
+                  <span>
+                    <strong>
+                      {member.role === "business"
+                        ? "Company workspace"
+                        : "Carrier / LLC workspace"}
+                    </strong>
+                    <small>{member.display_name}</small>
+                  </span>
+                  <ArrowRight />
+                </button>
+              ))}
+              {error && (
+                <p className="error" role="alert">
+                  {error}
+                </p>
+              )}
+              <button className="text-button" onClick={() => signOut()}>
+                Sign out
+              </button>
+            </div>
+          ) : configured === null ? (
             <p role="status">Checking sign-in availability…</p>
           ) : !configured ? (
             <div className="auth-setup" role="status">
@@ -451,17 +570,66 @@ export function AuthGate({ children }) {
             </div>
           ) : (
             <>
-              <button
-                className="primary google-signin"
-                onClick={beginGoogle}
-                disabled={busy}
-              >
-                {busy ? "Please wait…" : "Continue with Google"}
-                <ArrowRight />
-              </button>
-              <p className="helper">
-                Use the Google account associated with your invitation.
-              </p>
+              {config.passwordEnabled !== false && (
+                <form onSubmit={passwordSignIn} className="password-form">
+                  <label htmlFor="login-email">Email address</label>
+                  <input
+                    id="login-email"
+                    type="email"
+                    autoComplete="username"
+                    required
+                    maxLength={254}
+                    value={email}
+                    disabled={busy}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <label htmlFor="login-password">Password</label>
+                  <div className="password-input">
+                    <input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      disabled={busy}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      aria-pressed={showPassword}
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                  <button type="submit" className="primary" disabled={busy}>
+                    {busy ? "Signing in…" : "Sign in"}
+                    <ArrowRight />
+                  </button>
+                  <p className="helper">
+                    Need access or a password reset? Contact your preview
+                    administrator. Passwords are never stored in this app.
+                  </p>
+                </form>
+              )}
+              {config.googleEnabled && (
+                <>
+                  <button
+                    className="primary google-signin"
+                    onClick={beginGoogle}
+                    disabled={busy}
+                  >
+                    {busy ? "Please wait…" : "Continue with Google"}
+                    <ArrowRight />
+                  </button>
+                  <p className="helper">
+                    Use the Google account associated with your invitation.
+                  </p>
+                </>
+              )}
               {error && !config.emailOtpEnabled && (
                 <p role="alert" className="error">
                   {error}

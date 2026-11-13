@@ -6,6 +6,8 @@ import { chromium } from "@playwright/test";
 const root = resolve("dist");
 const mime = {
   ".html": "text/html",
+  ".mp4": "video/mp4",
+  ".json": "application/json",
   ".js": "text/javascript",
   ".css": "text/css",
   ".woff2": "font/woff2",
@@ -19,7 +21,8 @@ const server = createServer(async (req, res) => {
   }
   const path = resolve(
     root,
-    decodeURIComponent(url.pathname.slice("/shypit/".length)) || "index.html",
+    (decodeURIComponent(url.pathname.slice("/shypit/".length)) || "") +
+      (url.pathname.endsWith("/") ? "index.html" : ""),
   );
   if (!path.startsWith(root + "/") && path !== root) {
     res.writeHead(403);
@@ -76,7 +79,7 @@ try {
       await page.getByText("Sign-in is being set up.").waitFor();
     else
       await page
-        .getByRole("button", { name: "Continue with Google" })
+        .getByRole("button", { name: "Sign in", exact: true })
         .waitFor();
     assert.deepEqual(
       errors,
@@ -84,6 +87,34 @@ try {
       "Production page must not have failed assets or runtime errors",
     );
     console.log(`Locked production /shypit/ smoke passed: ${viewport.width}px`);
+    await page.goto(
+      `http://127.0.0.1:${server.address().port}/shypit/walkthrough/`,
+    );
+    const media = page.locator("video");
+    await media.evaluate(
+      (video) =>
+        new Promise((resolve, reject) => {
+          if (video.readyState >= 1) return resolve();
+          video.onloadedmetadata = () => resolve();
+          video.onerror = () => reject(Error("Walkthrough media failed"));
+        }),
+    );
+    assert.ok(
+      await media.evaluate(
+        (video) => video.duration > 45 && video.duration < 90,
+      ),
+      "Walkthrough duration must match the recorded scenario",
+    );
+    await media.evaluate(async (video) => {
+      video.muted = true;
+      await video.play();
+    });
+    await page.waitForTimeout(400);
+    assert.ok(
+      await media.evaluate((video) => video.currentTime > 0),
+      "Walkthrough must play",
+    );
+    console.log(`Walkthrough playback passed: ${viewport.width}px`);
     await page.close();
   }
 } finally {
