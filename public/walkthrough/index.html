@@ -5,14 +5,26 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="referrer" content="no-referrer" />
     <link rel="icon" href="../brand/app-icon-32.png" />
-    <title>Shypit — A shipment, together</title>
+    <title>Shypit — Admin & shipment workflows</title>
     <style>
+      @font-face {
+        font-family: "DM Sans";
+        src: url("../brand/DM-Sans-Regular.woff2") format("woff2");
+        font-weight: 400;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "DM Sans";
+        src: url("../brand/DM-Sans-Bold.woff2") format("woff2");
+        font-weight: 700;
+        font-display: swap;
+      }
       body {
         margin: 0;
         background: #faf9f6;
         color: #101d32;
         font:
-          16px/1.65 system-ui,
+          16px/1.65 "DM Sans",
           sans-serif;
       }
       header {
@@ -90,6 +102,26 @@
           font-size: 13px;
         }
       }
+      #chapters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 18px 0;
+      }
+      #chapters button {
+        font: inherit;
+        font-size: 14px;
+        color: #087f78;
+        background: #e7f3f0;
+        border: 1px solid #b4c9c5;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      #chapters button:focus-visible {
+        outline: 3px solid #087f78;
+        outline-offset: 3px;
+      }
     </style>
   </head>
   <body>
@@ -103,26 +135,34 @@
       ><a href="../">Back to sign-in</a>
     </header>
     <main>
-      <p class="eyebrow">GOOD-CASE SHIPMENT WALKTHROUGH</p>
-      <h1>
-        A small business.<br />An independent LLC.<br />One successful delivery.
-      </h1>
+      <p class="eyebrow">ADMIN & TEAM WORKFLOW WALKTHROUGH</p>
+      <h1>One platform.<br />A trusted team.<br />A shipment, together.</h1>
       <p>
-        A 55-second, captioned preview of the company and carrier journeys,
-        including the carrier’s mobile experience.
+        A captioned walkthrough of admin controls, company booking, the
+        carrier’s mobile experience, and delivery review.
       </p>
       <video
         controls
         playsinline
         preload="metadata"
-        aria-label="Captioned sample shipment walkthrough"
+        poster="workflow-poster.jpg"
+        aria-label="Captioned admin and sample shipment walkthrough"
       >
-        <source src="shypit-good-case.mp4" type="video/mp4" />
+        <source src="shypit-good-case.mp4?v=admin-team-v2" type="video/mp4" />
         Your browser cannot play this video.
-        <a href="shypit-good-case.mp4">Download the MP4</a>.
+        <a href="shypit-good-case.mp4?v=admin-team-v2">Download the MP4</a>.
       </video>
+      <nav id="chapters" aria-label="Video chapters"></nav>
       <p>
-        <a href="shypit-good-case.mp4" download>Download the walkthrough</a>
+        <a href="shypit-good-case.mp4?v=admin-team-v2" download
+          >Download the walkthrough</a
+        >
+      </p>
+      <p>
+        <a href="shypit-carrier-mobile.mp4" target="_blank" rel="noreferrer"
+          >Watch the carrier chapter in portrait</a
+        >
+        — a larger view for phone screens.
       </p>
       <p class="note">
         Scripted preview with fictional accounts and sample freight.
@@ -133,6 +173,12 @@
       <details>
         <summary>Read the walkthrough</summary>
         <ol>
+          <li>
+            An approved owner enters Admin Login from the home page, reviews
+            pilot counts, grants a fictional reviewer Overview-only access, and
+            reviews audit history, operations, and build tools. Founder accounts
+            are protected; only owners can change access.
+          </li>
           <li>
             Cedar Supply Co. sells eight pallets of office organizers to Harbor
             Office Goods. The company enters its shipment details, reviews the
@@ -155,5 +201,34 @@
         </ol>
       </details>
     </main>
+    <script>
+      fetch("chapters.json")
+        .then((response) => {
+          if (!response.ok) throw Error();
+          return response.json();
+        })
+        .then((data) => {
+          const video = document.querySelector("video"),
+            nav = document.querySelector("#chapters");
+          data.chapters.forEach((chapter) => {
+            const button = document.createElement("button");
+            const minutes = Math.floor(chapter.start / 60),
+              seconds = Math.floor(chapter.start % 60)
+                .toString()
+                .padStart(2, "0");
+            button.textContent = `${minutes}:${seconds} · ${chapter.title}`;
+            button.type = "button";
+            button.addEventListener("click", async () => {
+              video.currentTime = chapter.start;
+              try {
+                await video.play();
+              } catch {}
+              video.focus();
+            });
+            nav.append(button);
+          });
+        })
+        .catch(() => {});
+    </script>
   </body>
 </html>

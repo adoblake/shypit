@@ -244,7 +244,7 @@ export default function Admin({ request, profile, onAccessChanged }) {
               Build & deployment checks ↗
             </a>
             <a href="walkthrough/" target="_blank" rel="noreferrer">
-              Watch the sample shipment ↗
+              Watch admin & shipment workflows ↗
             </a>
           </div>
           <h3>Before a real shipment</h3>

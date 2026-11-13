@@ -7,6 +7,9 @@ const root = resolve("dist");
 const mime = {
   ".html": "text/html",
   ".mp4": "video/mp4",
+  ".jpg": "image/jpeg",
+  ".png": "image/png",
+  ".svg": "image/svg+xml",
   ".json": "application/json",
   ".js": "text/javascript",
   ".css": "text/css",
@@ -30,10 +33,31 @@ const server = createServer(async (req, res) => {
   }
   try {
     const body = await readFile(path);
-    res.writeHead(200, {
+    const headers = {
       "Content-Type": mime[extname(path)] || "application/octet-stream",
-    });
-    res.end(body);
+      "Accept-Ranges": "bytes",
+    };
+    const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range || "");
+    if (range) {
+      const start = Number(range[1]),
+        end = Math.min(
+          range[2] ? Number(range[2]) : body.length - 1,
+          body.length - 1,
+        );
+      if (start > end) {
+        res.writeHead(416, { "Content-Range": `bytes */${body.length}` });
+        return res.end();
+      }
+      res.writeHead(206, {
+        ...headers,
+        "Content-Length": end - start + 1,
+        "Content-Range": `bytes ${start}-${end}/${body.length}`,
+      });
+      res.end(body.subarray(start, end + 1));
+    } else {
+      res.writeHead(200, { ...headers, "Content-Length": body.length });
+      res.end(body);
+    }
   } catch {
     res.writeHead(404);
     res.end("Not found");
@@ -104,10 +128,32 @@ try {
     );
     assert.ok(
       await media.evaluate(
-        (video) => video.duration > 45 && video.duration < 90,
+        (video) => video.duration > 65 && video.duration < 240,
       ),
       "Walkthrough duration must match the recorded scenario",
     );
+    const chapterData = JSON.parse(
+      await readFile("dist/walkthrough/chapters.json", "utf8"),
+    );
+    assert.equal(
+      chapterData.chapters.length,
+      4,
+      "Four admin/team workflow chapters",
+    );
+    assert.ok(
+      Math.abs(
+        (await media.evaluate((video) => video.duration)) -
+          chapterData.duration,
+      ) < 1,
+      "Chapter timing matches video duration",
+    );
+    await page.getByRole("button", { name: /Carrier on mobile/ }).click();
+    await page.waitForFunction(
+      (start) =>
+        Math.abs(document.querySelector("video").currentTime - start) < 2,
+      chapterData.chapters[2].start,
+    );
+
     await media.evaluate(async (video) => {
       video.muted = true;
       await video.play();

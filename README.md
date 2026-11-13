@@ -12,7 +12,7 @@ Responsive private freight workspace for businesses and carriers. React + Vite; 
 
 [Set up private access for you and Ronald](docs/preview-access.md). Both founders can be explicitly assigned company and LLC-carrier workspaces; the app lists only server-approved memberships. Passwords are created privately in Shypit after verifying a secure email link. [Activate password setup, recovery and server lockouts](docs/account-recovery.md).
 
-[Watch the captioned good-case walkthrough](public/walkthrough/shypit-good-case.mp4). It uses fictional B2B shipper, customer and LLC-carrier data; dispatch handoff and payouts are simulated.
+[Watch the admin and team workflow walkthrough](https://adoblake.github.io/shypit/walkthrough/). The 103-second silent, captioned recording includes admin permissions, company booking, mobile LLC-carrier work, and delivery review, with chapter navigation and a portrait carrier clip. It uses fictional accounts and freight; dispatch handoff and payouts are simulated.
 
 ## Run
 
