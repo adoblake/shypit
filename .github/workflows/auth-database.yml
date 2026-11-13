@@ -1,0 +1,29 @@
+name: Activate authentication database
+on:
+  workflow_dispatch:
+    inputs:
+      invitation_keys:
+        description: Two approved SHA-256 invitation keys as a JSON array; never enter raw email addresses or passwords.
+        required: true
+permissions:
+  contents: read
+jobs:
+  activate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Validate secure management access
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: python3 scripts/validate_supabase_access.py
+      - run: npm run test:policies
+      - name: Activate prepared schema and approved preview invitations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SHYPIT_INVITATION_KEYS: ${{ inputs.invitation_keys }}
+        run: node scripts/activate-auth-database.mjs

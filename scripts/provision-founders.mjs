@@ -1,10 +1,16 @@
 // Outputs SQL for an administrator. Never accepts passwords or connects to a database.
 import { readFile } from "node:fs/promises";
 import { initialShipments, loads } from "../tests/fixtures/demo-data.js";
-const [ownerEmail, ronaldEmail, mode = "--fresh"] = process.argv.slice(2);
+const [ownerEmail, ronaldEmail, mode = "--fresh", format] =
+  process.argv.slice(2);
+const hashed = format === "--hashed";
 if (
-  !ownerEmail?.includes("@") ||
-  !ronaldEmail?.includes("@") ||
+  !(hashed
+    ? /^[a-f0-9]{64}$/.test(ownerEmail || "")
+    : ownerEmail?.includes("@")) ||
+  !(hashed
+    ? /^[a-f0-9]{64}$/.test(ronaldEmail || "")
+    : ronaldEmail?.includes("@")) ||
   ownerEmail.toLowerCase() === ronaldEmail.toLowerCase() ||
   !["--fresh", "--existing"].includes(mode)
 )
@@ -52,7 +58,7 @@ insert into public.workspaces(id,kind,data) values
  ('b2222222-2222-4222-8222-222222222222','driver',${quote(data)}::jsonb)
 on conflict(id) do nothing;
 insert into shypit_private.preview_invitations(email_key,workspace_id,role,display_name,active)
-select encode(sha256(convert_to(lower(email),'UTF8')),'hex'),workspace_id,role,display_name,true from (values
+select ${hashed ? "email" : "encode(sha256(convert_to(lower(email),'UTF8')),'hex')"},workspace_id,role,display_name,true from (values
  (${quote(ownerEmail)},'a1111111-1111-4111-8111-111111111111'::uuid,'business','Company preview'),
  (${quote(ownerEmail)},'b2222222-2222-4222-8222-222222222222'::uuid,'driver','LLC carrier preview'),
  (${quote(ronaldEmail)},'a1111111-1111-4111-8111-111111111111'::uuid,'business','Company preview'),
