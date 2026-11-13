@@ -32,3 +32,11 @@ This is a browser-verified frontend foundation, not a live logistics service. No
 ## Deployment follow-up
 
 Reproduced failure serving a non-Actions build at `/shypit/` with root-absolute asset paths. Changed Vite to relative asset paths. The production smoke test now verifies rendered business booking and driver acceptance at 1440px and 390px, with no failed HTTP assets or uncaught runtime errors. Both passed locally. This confirms the reproduced asset-path case is fixed; the live Pages cause remains unconfirmed while network access is blocked. The Pages workflow now also runs on foundation-branch pushes and gates deployment on the production smoke test.
+
+## Invite-only access update
+
+UI result: passed. Desktop (1440 × 1024) and mobile (390 × 844) sign-in screens were captured and inspected, along with authenticated sample business/carrier screens. Navy/teal branding, touch-friendly controls, readable errors, and the approved workspace structure remain intact. Google is the default sign-in; email verification is optional. The header displays assigned identity and sign-out instead of an unrestricted role selector. Review captures are committed under docs/review and use test-intercepted identity responses, not a live provider.
+
+Validation: 28 browser checks passed at desktop/mobile sizes, including fail-closed missing configuration, bad codes, nonmembers, PKCE callbacks/verifiers, sign-out, session expiration, revocation checks, and authorized workflow persistence. Eight PostgreSQL policy scenarios passed through PGlite: anonymous reads, cross-workspace reads, mixed-role tenancy, self-invitation/role escalation, role-scoped writes, nonmembers, and revoked membership. Production /shypit/ checks pass at both viewports with no public workspace access.
+
+Activation result: blocked on external setup. No actual Supabase project, Google OAuth client, or approved live memberships are configured. Local browser tests mock the identity service; policy tests use PostgreSQL with a minimal auth.uid stand-in. Real Google authentication and deployed Supabase policies still require activation and verification using supabase/SETUP.md. Do not describe the live service as fully secured/activated based only on frontend tests.

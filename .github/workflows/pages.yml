@@ -20,7 +20,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm run test:policies
       - run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
       - run: npx playwright install --with-deps chromium
       - run: npm run test:production
       - uses: actions/configure-pages@v5
