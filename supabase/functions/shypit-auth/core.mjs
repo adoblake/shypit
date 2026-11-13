@@ -32,7 +32,7 @@ export function makeAuthHandler({
     const cors = {
       "Access-Control-Allow-Origin": origin,
       "Access-Control-Allow-Headers": "content-type,apikey",
-      "Access-Control-Allow-Methods": "POST,OPTIONS",
+      "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
       Vary: "Origin",
       "Cache-Control": "no-store",
     };
@@ -65,6 +65,17 @@ export function makeAuthHandler({
       return reply(403, { error: genericFailure });
     if (request.method === "OPTIONS")
       return new Response(null, { status: 204, headers: cors });
+    if (
+      request.method === "GET" &&
+      new URL(request.url).pathname.endsWith("/health")
+    ) {
+      try {
+        const ready = await rpc("shypit_auth_health", {});
+        return reply(ready === true ? 200 : 503, { ready: ready === true });
+      } catch {
+        return reply(503, { ready: false });
+      }
+    }
     if (request.method !== "POST") return reply(405, { error: genericFailure });
     let reservation;
     async function upstream(

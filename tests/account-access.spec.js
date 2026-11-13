@@ -125,3 +125,59 @@ test("recovery request limit disables sending after the server refuses the next 
     page.getByRole("button", { name: "Send secure link" }),
   ).toBeDisabled();
 });
+test("missing backend disables sending, explains activation and allows a fresh connection check", async ({
+  page,
+}) => {
+  const state = await installAuthMock(page, {
+    serviceReady: false,
+    emailOtpEnabled: false,
+    googleEnabled: false,
+  });
+  let submissions = 0;
+  page.on("request", (r) => {
+    if (r.url().endsWith("/functions/v1/shypit-auth")) submissions++;
+  });
+  await page.goto("/");
+  await expect(page.getByText("Account setup is not ready yet.")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Sign in", exact: true }),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Create your password", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Send secure link" }),
+  ).toBeDisabled();
+  expect(submissions).toBe(0);
+  state.serviceReady = true;
+  await page.getByRole("button", { name: "Check connection again" }).click();
+  await expect(
+    page.getByRole("button", { name: "Send secure link" }),
+  ).toBeEnabled();
+  await expect(page.getByText("Account setup is not ready yet.")).toHaveCount(
+    0,
+  );
+});
+test("a network failure is explained without claiming an email was sent", async ({
+  page,
+}) => {
+  await installAuthMock(page, { emailOtpEnabled: false, googleEnabled: false });
+  await page.route("https://auth.shypit.test/functions/v1/shypit-auth", (r) =>
+    r.abort("failed"),
+  );
+  await page.goto("/");
+  await page
+    .getByRole("button", { name: "Create your password", exact: true })
+    .click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("invited@example.test");
+  await page.getByRole("button", { name: "Send secure link" }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    "Account services cannot be reached",
+  );
+  await expect(page.getByRole("alert")).not.toContainText("Failed to fetch");
+  await expect(
+    page.getByRole("status").filter({ hasText: "check its inbox" }),
+  ).toHaveCount(0);
+});

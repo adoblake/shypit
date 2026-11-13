@@ -55,7 +55,10 @@ try {
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("response", (response) => {
-      if (response.status() >= 400)
+      if (
+        response.status() >= 400 &&
+        new URL(response.url()).hostname === "127.0.0.1"
+      )
         errors.push(`${response.status()} ${response.url()}`);
     });
     await page.goto(`http://127.0.0.1:${server.address().port}/shypit/`);

@@ -36,6 +36,11 @@ begin
 end;$$;
 revoke all on function public.shypit_consume_recovery(text) from public,anon,authenticated;
 grant execute on function public.shypit_consume_recovery(text) to service_role;
+create or replace function public.shypit_auth_health() returns boolean language sql security definer set search_path='' as $$
+ select to_regclass('shypit_private.auth_limits') is not null and to_regclass('shypit_private.session_permits') is not null and to_regclass('shypit_private.preview_invitations') is not null and to_regclass('shypit_private.access_help') is not null;
+$$;
+revoke all on function public.shypit_auth_health() from public,anon,authenticated;
+grant execute on function public.shypit_auth_health() to service_role;
 create or replace function public.shypit_auth_begin(p_email_key text,p_action text) returns jsonb
 language plpgsql security definer set search_path='' as $$
 declare r shypit_private.auth_limits; reservation uuid; is_request boolean; expired_count integer; global_lock timestamptz;

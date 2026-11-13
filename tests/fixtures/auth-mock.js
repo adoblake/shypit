@@ -10,6 +10,7 @@ export async function installAuthMock(page, options = {}) {
     role: "business",
     member: true,
     badCode: false,
+    serviceReady: true,
     failSave: false,
     revision: 0,
     data: structuredClone({ shipments: initialShipments, loads, jobs: [] }),
@@ -30,6 +31,11 @@ export async function installAuthMock(page, options = {}) {
     const request = route.request(),
       url = new URL(request.url()),
       path = url.pathname;
+    if (path === "/functions/v1/shypit-auth/health")
+      return route.fulfill({
+        status: state.serviceReady ? 200 : 503,
+        json: { ready: state.serviceReady },
+      });
     if (path === "/functions/v1/shypit-auth") {
       const input = request.postDataJSON();
       state.authFailures ??= 0;

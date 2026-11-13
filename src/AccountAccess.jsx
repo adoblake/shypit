@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from "react";
 import { ArrowRight } from "@phosphor-icons/react";
 export async function accountRequest(config, body) {
-  const response = await fetch(
-    config.url.replace(/\/$/, "") + "/functions/v1/shypit-auth",
-    {
-      method: "POST",
-      headers: { apikey: config.publicKey, "Content-Type": "application/json" },
-      cache: "no-store",
-      credentials: "omit",
-      redirect: "error",
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(25000),
-    },
-  );
+  let response;
+  try {
+    response = await fetch(
+      config.url.replace(/\/$/, "") + "/functions/v1/shypit-auth",
+      {
+        method: "POST",
+        headers: {
+          apikey: config.publicKey,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+        credentials: "omit",
+        redirect: "error",
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(25000),
+      },
+    );
+  } catch {
+    const error = new Error(
+      "Account services cannot be reached right now. No email delivery was confirmed. Please try again after the service is connected.",
+    );
+    error.code = "ACCOUNT_UNAVAILABLE";
+    throw error;
+  }
   let result;
   try {
     result = await response.json();
@@ -21,8 +33,10 @@ export async function accountRequest(config, body) {
   }
   if (!response.ok) {
     const e = new Error(
-      result.error ||
-        "Account services are unavailable. Please try again later.",
+      response.status === 404
+        ? "Account services are not connected yet. Please contact your administrator."
+        : result.error ||
+            "Account services are unavailable. Please try again later.",
     );
     e.status = response.status;
     e.lockedUntil = result.lockedUntil;
@@ -54,6 +68,7 @@ export default function AccountAccess({
   setEmail,
   recovery,
   onBack,
+  available = true,
 }) {
   const [password, setPassword] = useState(""),
     [confirm, setConfirm] = useState(""),
@@ -87,7 +102,7 @@ export default function AccountAccess({
         : "Reset your password.";
   async function submit(event) {
     event.preventDefault();
-    if (busy || lockedUntil) return;
+    if (busy || lockedUntil || !available) return;
     setError("");
     setMessage("");
     if (
@@ -169,7 +184,7 @@ export default function AccountAccess({
             maxLength={254}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            disabled={busy || Boolean(lockedUntil)}
+            disabled={busy || Boolean(lockedUntil) || !available}
           />
           {setting && (
             <>
@@ -203,7 +218,7 @@ export default function AccountAccess({
           )}
           <button
             className="primary"
-            disabled={busy || Boolean(lockedUntil)}
+            disabled={busy || Boolean(lockedUntil) || !available}
             type="submit"
           >
             {busy

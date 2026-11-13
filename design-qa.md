@@ -68,3 +68,9 @@ Server coverage: ten PostgreSQL security scenarios and eight gateway integration
 The server function is separately deployable and is not included in the browser bundle. Counter/permit/invitation records are private and service-only. Database session permits prevent the native Supabase login endpoint from bypassing application locks. Recovery tokens are cleared from the URL and held in memory until completion. Passwords and privileged keys are not persisted in the frontend.
 
 Live activation remains blocked pending administrator installation of the updated SQL, deployment of the auth gateway with authorized Supabase access, and configuration of a working email sender. No actual invitation or recovery email was sent by this work. The UI and code are reviewable, but real setup/reset delivery and deployed lockouts are not yet verified. The private founder setup file has been regenerated outside the public checkout and no longer requires pre-created users.
+
+## Missing authentication function fix
+
+Confirmed the live endpoint's OPTIONS request returns HTTP 404 / Requested function was not found. The previous backend deployment stopped at its missing credential check. The browser surfaced this failed CORS preflight as Failed to fetch.
+
+The app now checks service/database readiness before enabling account submissions, explains an unavailable service, offers a connection recheck, and catches network errors without claiming a successful email send. The gateway health endpoint sends no email and consumes no attempt budget. Desktop/mobile readiness, reconnection, failed-send and regression cases passed (22 targeted checks), along with server/gateway and database policies. The mobile unavailable-state screenshot was inspected. Real activation remains blocked on authorized backend deployment, database installation and SMTP; the public key alone cannot perform them.

@@ -2,6 +2,10 @@
 
 The frontend now includes **Create your password**, **Forgot password?**, and **Forgot email?**. Real operation requires the database security migration, server function, and email delivery below. A public project key cannot install these or send administrative invitations on its own.
 
+## Service readiness
+
+The sign-in page checks the gateway's `/health` endpoint before enabling sign-in, setup, or recovery submissions. The check verifies that the gateway can reach the installed security schema; it does not consume attempts or send email. Missing functions, failed connections, and incomplete database activation show **Account setup is not ready yet**, with a recheck button. A successful health check does not establish SMTP delivery; that must be tested separately after configuring the sender.
+
 ## What the processes do
 
 - **Create your password:** enter an administrator-approved email. The server sends an invitation link through Supabase. Open the link, confirm the invited address, and enter a new password twice. New passwords must be 12–128 characters. Membership activates only after the identity provider validates email ownership. You do not have to invent a password in the dashboard first.

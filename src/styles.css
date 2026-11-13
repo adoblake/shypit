@@ -1368,3 +1368,20 @@ dialog[open] {
 .auth-form form .auth-note {
   margin-top: 12px;
 }
+.account-availability {
+  background: #f0f3ee;
+  border: 1px solid #c7d3c9;
+  border-radius: 8px;
+  padding: 18px;
+  margin: 20px 0;
+  color: #354b44;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.account-availability p {
+  margin: 8px 0 0;
+}
+.account-availability .text-button {
+  margin: 8px 0 0;
+  padding-left: 0;
+}

@@ -62,6 +62,7 @@ export function AuthGate({ children }) {
   const [recovery, setRecovery] = useState(readRecoveryLink);
   const [accessMode, setAccessMode] = useState(null);
   const [signInLocked, setSignInLocked] = useState(null);
+  const [accountService, setAccountService] = useState("checking");
   const [config, setConfig] = useState(null),
     [configured, setConfigured] = useState(null),
     [stage, setStage] = useState("email"),
@@ -123,6 +124,30 @@ export function AuthGate({ children }) {
       } catch {}
     return () => controller.abort();
   }, []);
+  async function checkAccountService(currentConfig = config) {
+    if (!currentConfig) return;
+    setAccountService("checking");
+    try {
+      const response = await fetch(
+        currentConfig.url.replace(/\/$/, "") +
+          "/functions/v1/shypit-auth/health",
+        {
+          headers: { apikey: currentConfig.publicKey },
+          cache: "no-store",
+          signal: AbortSignal.timeout(8000),
+        },
+      );
+      const result = await response.json();
+      setAccountService(
+        response.ok && result.ready === true ? "ready" : "unavailable",
+      );
+    } catch {
+      setAccountService("unavailable");
+    }
+  }
+  useEffect(() => {
+    if (config) checkAccountService(config);
+  }, [config]);
   async function api(
     path,
     { method = "GET", body, access = token.current, signal } = {},
@@ -238,7 +263,7 @@ export function AuthGate({ children }) {
   }, [account]);
   async function sendCode(e) {
     e.preventDefault();
-    if (busy || !configured) return;
+    if (busy || !configured || accountService !== "ready") return;
     setBusy(true);
     setError("");
     setMessage("");
@@ -317,7 +342,7 @@ export function AuthGate({ children }) {
   }
   async function passwordSignIn(e) {
     e.preventDefault();
-    if (busy || !configured) return;
+    if (busy || !configured || accountService !== "ready") return;
     setBusy(true);
     setError("");
     setMessage("");
@@ -559,10 +584,33 @@ export function AuthGate({ children }) {
               </p>
             </>
           )}
+          {configured && !account && accountService !== "ready" && (
+            <div className="account-availability" role="status">
+              <strong>
+                {accountService === "checking"
+                  ? "Checking account service…"
+                  : "Account setup is not ready yet."}
+              </strong>
+              <p>
+                {accountService === "checking"
+                  ? "Please wait while we check the secure connection."
+                  : "The secure authentication service is unavailable. No setup or recovery email has been confirmed. Your administrator needs to connect the service before you can continue."}
+              </p>
+              <button
+                type="button"
+                className="text-button"
+                onClick={() => checkAccountService()}
+                disabled={accountService === "checking"}
+              >
+                Check connection again
+              </button>
+            </div>
+          )}
           {configured && (accessMode || recovery) ? (
             <AccountAccess
               key={accessMode || "password-link"}
               config={config}
+              available={accountService === "ready"}
               mode={accessMode || "reset"}
               email={email}
               setEmail={setEmail}
@@ -659,7 +707,9 @@ export function AuthGate({ children }) {
                   <button
                     type="submit"
                     className="primary"
-                    disabled={busy || signInLocked}
+                    disabled={
+                      busy || signInLocked || accountService !== "ready"
+                    }
                   >
                     {busy ? "Signing in…" : "Sign in"}
                     <ArrowRight />

@@ -264,3 +264,18 @@ test("logout revokes its own application session permit", async () => {
     0,
   );
 });
+test("health checks verify installed database support without consuming attempts or sending email", async () => {
+  const r = await handler(
+    new Request("https://edge.test/health", {
+      headers: { Origin: "https://app.test" },
+    }),
+  );
+  assert.equal(r.status, 200);
+  assert.deepEqual(await r.json(), { ready: true });
+  assert.equal(
+    (await db.query("select * from shypit_private.auth_limits")).rows.length,
+    0,
+  );
+  assert.equal(stats.invite, 0);
+  assert.equal(stats.password, 0);
+});
