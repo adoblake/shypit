@@ -76,11 +76,22 @@ async function run() {
         result?.error?.missing_permissions?.filter((x) =>
           /^[a-z_]+$/.test(x),
         ) || [];
+      let detail = typeof result?.message === "string" ? result.message : "";
+      detail = detail
+        .replaceAll(token, "[redacted]")
+        .replace(/sbp_[A-Za-z0-9_-]+/g, "[redacted]")
+        .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[email redacted]")
+        .slice(0, 700);
       throw Error(
-        "Supabase management request rejected (HTTP " +
+        "Supabase " +
+          path +
+          " rejected (HTTP " +
           response.status +
           ")." +
-          (missing.length ? " Required permission: " + missing.join(", ") : ""),
+          (missing.length
+            ? " Required permission: " + missing.join(", ")
+            : "") +
+          (detail ? " " + detail : ""),
       );
     }
     return result;
