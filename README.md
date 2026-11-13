@@ -2,6 +2,10 @@
 
 Responsive freight marketplace foundation for businesses and drivers. Built with React and Vite, following the selected navy/teal design with a shipment list and booking panel. Mobile has stacked workflows and touch-friendly controls; desktop keeps operational context beside the task.
 
+## Preview the design
+
+[Open the desktop and mobile screenshot gallery](docs/review/README.md). For an interactive review site, use the GitHub Pages workflow described below.
+
 ## Run locally
 
 Node.js 24 and npm 11 are used in development.
