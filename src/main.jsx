@@ -1,3 +1,4 @@
+import BankingReturn, { hasBankingReturn } from "./BankingReturn";
 import Banking from "./Banking";
 import Brand from "./Brand";
 import React, { useState, useEffect } from "react";
@@ -63,16 +64,18 @@ function Route({ item }) {
     </div>
   );
 }
-function App({ account, initialData }) {
+function App({ account, initialData, initialPage }) {
   const role = account.role;
   const initialShipments = initialData.shipments;
   const loads = initialData.loads;
   const [page, setPage] = useState(
-      role === "business"
-        ? new URLSearchParams(window.location.search).get("view") === "tracking"
-          ? "Package tracking"
-          : "Shipments"
-        : "Find loads",
+      initialPage ||
+        (role === "business"
+          ? new URLSearchParams(window.location.search).get("view") ===
+            "tracking"
+            ? "Package tracking"
+            : "Shipments"
+          : "Find loads"),
     ),
     [shipments, setShipments] = useWorkspaceField("shipments"),
     [jobs, setJobs] = useWorkspaceField("jobs"),
@@ -1007,5 +1010,11 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
   );
 }
 createRoot(document.getElementById("root")).render(
-  <AuthGate>{(props) => <App {...props} />}</AuthGate>,
+  hasBankingReturn() ? (
+    <BankingReturn>
+      <AuthGate>{(props) => <App {...props} />}</AuthGate>
+    </BankingReturn>
+  ) : (
+    <AuthGate>{(props) => <App {...props} />}</AuthGate>
+  ),
 );

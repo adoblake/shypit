@@ -106,3 +106,53 @@ test("limited admin sees only granted sections and loses access when revoked", a
   await page.getByRole("button", { name: "Refresh data" }).click();
   await expect(page.getByLabel("Email address", { exact: true })).toBeVisible();
 });
+test("public Admin Login leads to checked admin sign-in with account help in context", async ({
+  page,
+}) => {
+  await installAuthMock(page, {
+    emailOtpEnabled: false,
+    googleEnabled: false,
+    adminProfile: { owner: true, capabilities },
+    adminData: { stats: { workspaces: 2 } },
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Admin Login", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Admin sign-in." }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Admin account help", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("owner@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("Sample-only-password!");
+  await page.getByRole("button", { name: "Sign in as admin" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Keep good work moving." }),
+  ).toBeVisible();
+});
+test("admin sign-in does not grant a regular account admin access", async ({
+  page,
+}) => {
+  await installAuthMock(page, { emailOtpEnabled: false, googleEnabled: false });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Admin Login", exact: true }).click();
+  await page
+    .getByLabel("Email address", { exact: true })
+    .fill("regular@example.test");
+  await page
+    .getByLabel("Password", { exact: true })
+    .fill("Sample-only-password!");
+  await page.getByRole("button", { name: "Sign in as admin" }).click();
+  await expect(
+    page.getByText(
+      "This account does not have admin access. Use workspace sign-in to continue.",
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Keep good work moving." }),
+  ).toHaveCount(0);
+});

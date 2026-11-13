@@ -226,7 +226,10 @@ export function makeBankingHandler({
           true,
         );
       }
-      const returnUrl = siteUrl + "?banking=return";
+      const returnUrl =
+        siteUrl +
+        "?banking=return&workspaceId=" +
+        encodeURIComponent(input.workspaceId);
       if (access.kind === "business") {
         const session = await stripe("checkout/sessions", {
           mode: "setup",
@@ -235,7 +238,10 @@ export function makeBankingHandler({
           expires_at: String(Math.floor(Date.now() / 1000) + 1800),
           "payment_method_types[0]": "us_bank_account",
           success_url: returnUrl,
-          cancel_url: siteUrl + "?banking=cancelled",
+          cancel_url:
+            siteUrl +
+            "?banking=cancelled&workspaceId=" +
+            encodeURIComponent(input.workspaceId),
           client_reference_id: input.workspaceId,
         });
         const url = safeUrl(session.url, "business");
@@ -263,7 +269,10 @@ export function makeBankingHandler({
       }
       const link = await stripe("account_links", {
         account: provider,
-        refresh_url: siteUrl + "?banking=retry",
+        refresh_url:
+          siteUrl +
+          "?banking=retry&workspaceId=" +
+          encodeURIComponent(input.workspaceId),
         return_url: returnUrl,
         type: "account_onboarding",
       });

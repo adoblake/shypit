@@ -1,3 +1,8 @@
+import {
+  rememberBanking,
+  bankingDestination,
+  clearBankingDestination,
+} from "./banking-return";
 import Brand from "./Brand";
 import Admin from "./Admin";
 import React, {
@@ -19,7 +24,7 @@ import AccountAccess, {
 } from "./AccountAccess";
 const Workspace = createContext(null);
 export function useBanking() {
-  return useContext(Workspace).bankingRequest;
+  return useContext(Workspace);
 }
 export function useWorkspaceField(field) {
   const value = useContext(Workspace);
@@ -64,6 +69,8 @@ function validData(d) {
   );
 }
 export function AuthGate({ children }) {
+  const [loginKind, setLoginKind] = useState("workspace");
+  const [initialPage, setInitialPage] = useState(null);
   const [adminProfile, setAdminProfile] = useState(null);
   const [recovery, setRecovery] = useState(readRecoveryLink);
   const [accessMode, setAccessMode] = useState(null);
@@ -338,6 +345,27 @@ export function AuthGate({ children }) {
     setMemberships(members);
     setPassword("");
     setShowPassword(false);
+    if (loginKind === "admin") {
+      const admin = members.find((member) => member.role === "admin");
+      if (!admin) {
+        await signOut(
+          "This account does not have admin access. Use workspace sign-in to continue.",
+        );
+        return;
+      }
+      await openWorkspace(admin, user, attempt);
+      return;
+    }
+    const destination = bankingDestination();
+    const resume = members.find(
+      (member) =>
+        member.role !== "admin" && member.workspace_id === destination,
+    );
+    if (resume) {
+      await openWorkspace(resume, user, attempt);
+      return;
+    }
+    if (destination) clearBankingDestination();
     if (members.length > 1) {
       setPendingUser(user);
       return;
@@ -366,6 +394,14 @@ export function AuthGate({ children }) {
       );
       if (rows.length !== 1 || !validData(rows[0].data)) throw Error();
       if (attempt !== epoch.current) return;
+      setInitialPage(
+        bankingDestination() === member.workspace_id
+          ? member.role === "business"
+            ? "Billing"
+            : "Earnings"
+          : null,
+      );
+      clearBankingDestination();
       revision.current = rows[0].revision;
       serverData.current = rows[0].data;
       accountRef.current = { ...member, userId: user.id, email: user.email };
@@ -592,8 +628,11 @@ export function AuthGate({ children }) {
         "Banking services cannot be reached. Please try again later.",
       );
     }
-    if (!response.ok)
-      throw Error(result.error || "Banking services are unavailable.");
+    if (!response.ok) {
+      const error = Error(result.error || "Banking services are unavailable.");
+      error.status = response.status;
+      throw error;
+    }
     return result;
   }
   async function adminRequest(name, body) {
@@ -601,7 +640,22 @@ export function AuthGate({ children }) {
   }
   if (account && data)
     return (
-      <Workspace.Provider value={{ data, update, bankingRequest }}>
+      <Workspace.Provider
+        value={{
+          data,
+          update,
+          bankingRequest,
+          prepareBankingReturn: () =>
+            rememberBanking(accountRef.current.workspace_id),
+          reauthenticateBanking: () => {
+            rememberBanking(accountRef.current.workspace_id);
+            setLoginKind("workspace");
+            return signOut(
+              "Sign in again to confirm your identity. We’ll return you to banking setup.",
+            );
+          },
+        }}
+      >
         <div className="session-strip">
           <span>
             <ShieldCheck size={17} />
@@ -666,7 +720,7 @@ export function AuthGate({ children }) {
             }}
           />
         ) : (
-          children({ account, initialData: data })
+          children({ account, initialData: data, initialPage })
         )}
       </Workspace.Provider>
     );
@@ -704,11 +758,14 @@ export function AuthGate({ children }) {
               <h2>
                 {pendingUser
                   ? "Choose your workspace."
-                  : "Sign in to your workspace."}
+                  : loginKind === "admin"
+                    ? "Admin sign-in."
+                    : "Sign in to your workspace."}
               </h2>
               <p className="muted">
-                Use the email address invited by your business or carrier
-                administrator.
+                {loginKind === "admin"
+                  ? "Use your approved admin email and password. Admin permissions are checked after sign-in."
+                  : "Use the email address invited by your business or carrier administrator."}
               </p>
             </>
           )}
@@ -859,29 +916,59 @@ export function AuthGate({ children }) {
                       busy || signInLocked || accountService !== "ready"
                     }
                   >
-                    {busy ? "Signing in…" : "Sign in"}
+                    {busy
+                      ? "Signing in…"
+                      : loginKind === "admin"
+                        ? "Sign in as admin"
+                        : "Sign in"}
                     <ArrowRight />
                   </button>
-                  <div className="account-links">
+                  <div className="login-route">
                     <button
                       type="button"
-                      onClick={() => setAccessMode("setup")}
+                      className="text-button"
+                      disabled={busy}
+                      onClick={() => {
+                        setLoginKind(
+                          loginKind === "admin" ? "workspace" : "admin",
+                        );
+                        setPassword("");
+                        setError("");
+                        setMessage("");
+                      }}
                     >
-                      Create your password
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAccessMode("reset")}
-                    >
-                      Forgot password?
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAccessMode("email-help")}
-                    >
-                      Forgot email?
+                      {loginKind === "admin"
+                        ? "Back to workspace sign-in"
+                        : "Admin Login"}
                     </button>
                   </div>
+                  <details className="login-help">
+                    <summary>
+                      {loginKind === "admin"
+                        ? "Admin account help"
+                        : "Password setup & account help"}
+                    </summary>
+                    <div className="account-links">
+                      <button
+                        type="button"
+                        onClick={() => setAccessMode("setup")}
+                      >
+                        Create your password
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAccessMode("reset")}
+                      >
+                        Forgot password?
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setAccessMode("email-help")}
+                      >
+                        Forgot email?
+                      </button>
+                    </div>
+                  </details>
                   <p className="auth-note">
                     10 failed attempts lock sign-in for 24 hours. Limits are
                     enforced by the server.

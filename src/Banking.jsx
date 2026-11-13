@@ -1,33 +1,78 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Bank, LockKey, ArrowSquareOut } from "@phosphor-icons/react";
 import { useBanking } from "./auth";
 import "./banking.css";
 export default function Banking({ kind }) {
-  const request = useBanking();
+  const {
+    bankingRequest: request,
+    prepareBankingReturn,
+    reauthenticateBanking,
+  } = useBanking();
+  const [hostedUrl, setHostedUrl] = useState("");
+  const [needsSignIn, setNeedsSignIn] = useState(false);
+  const launched = useRef(false),
+    poll = useRef(null),
+    checking = useRef(false);
   const [status, setStatus] = useState(null),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const business = kind === "business";
   async function refresh() {
+    if (checking.current) return;
+    checking.current = true;
     setBusy(true);
     setError("");
     try {
-      setStatus(await request("status"));
+      const current = await request("status");
+      setStatus(current);
+      if (current.state === "connected") {
+        setHostedUrl("");
+        launched.current = false;
+        clearInterval(poll.current);
+      }
     } catch {
       setStatus(null);
       setError(
         "Banking services are not connected or cannot be reached. Please try again later.",
       );
     } finally {
+      checking.current = false;
       setBusy(false);
     }
   }
   useEffect(() => {
     refresh();
+    const returned = () => {
+      if (launched.current && !document.hidden) refresh();
+    };
+    window.addEventListener("focus", returned);
+    document.addEventListener("visibilitychange", returned);
+    return () => {
+      window.removeEventListener("focus", returned);
+      document.removeEventListener("visibilitychange", returned);
+      clearInterval(poll.current);
+    };
   }, [kind]);
   async function start() {
     setBusy(true);
     setError("");
+    setNeedsSignIn(false);
+    setHostedUrl("");
+    let popup = null;
+    try {
+      popup = window.open("about:blank", "_blank");
+      if (popup) {
+        popup.opener = null;
+        popup.document.title = "Opening secure banking setup";
+        popup.document.body.textContent =
+          "Opening Stripe’s secure banking page. Keep your Shypit tab open.";
+      }
+    } catch {
+      try {
+        popup?.close();
+      } catch {}
+      popup = null;
+    }
     try {
       const result = await request("start");
       if (!result.url) throw Error("Banking setup is not connected yet.");
@@ -36,11 +81,27 @@ export default function Banking({ kind }) {
         url.protocol !== "https:" ||
         url.username ||
         url.password ||
+        (url.port && url.port !== "443") ||
         !["checkout.stripe.com", "connect.stripe.com"].includes(url.hostname)
       )
         throw Error("Unable to open the banking provider.");
-      window.location.assign(url.href);
+      prepareBankingReturn();
+      launched.current = true;
+      setHostedUrl(url.href);
+      if (popup) {
+        popup.location.replace(url.href);
+        clearInterval(poll.current);
+        poll.current = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(poll.current);
+            refresh();
+          }
+        }, 1000);
+      }
+      setBusy(false);
     } catch (e) {
+      if (popup) popup.close();
+      if (e.status === 403) setNeedsSignIn(true);
       setError(e.message || "Unable to start banking setup.");
       setBusy(false);
     }
@@ -81,6 +142,11 @@ export default function Banking({ kind }) {
           details. No real payments or payouts are enabled.
         </p>
       )}
+      <ol className="banking-steps" aria-label="Banking setup steps">
+        <li>Start setup here in Shypit.</li>
+        <li>Verify your bank and business details in the secure Stripe tab.</li>
+        <li>Come back here. We’ll check your verification status.</li>
+      </ol>
       <p>
         <LockKey size={18} /> Bank details are entered on Stripe’s hosted page.
         Shypit does not collect or store your account or routing numbers.
@@ -112,12 +178,28 @@ export default function Banking({ kind }) {
             <ArrowSquareOut size={19} />
           </button>
           <p className="helper">
-            You will leave Shypit for Stripe. You may need to sign in again when
-            you return; open {business ? "Billing" : "Earnings"} and refresh the
-            status. Bank verification may take time. For changes, sign in within
-            the last five minutes.
+            Stripe opens in a separate tab; keep this workspace open. If a fresh
+            sign-in is needed, we’ll bring you straight back to{" "}
+            {business ? "Billing" : "Earnings"}. Verification can take time.
           </p>
         </>
+      )}
+      {hostedUrl && (
+        <div className="banking-handoff" role="status">
+          <strong>Your secure setup link is ready.</strong>
+          <p>
+            Complete verification in the Stripe tab, then return here. If the
+            tab did not open, use the link below.
+          </p>
+          <a href={hostedUrl} target="_blank" rel="noopener noreferrer">
+            Continue securely on Stripe <ArrowSquareOut size={18} />
+          </a>
+        </div>
+      )}
+      {needsSignIn && (
+        <button className="primary" onClick={reauthenticateBanking}>
+          Sign in again to continue banking
+        </button>
       )}
       <button className="text-button" onClick={refresh} disabled={busy}>
         Refresh banking status

@@ -1470,3 +1470,24 @@ footer .brand-lockup {
   width: auto;
   min-height: 44px;
 }
+.login-route {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+.login-route .text-button {
+  width: auto;
+  min-height: 44px;
+}
+.login-help {
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.login-help summary {
+  cursor: pointer;
+  padding: 10px 0;
+}
+.login-help .account-links {
+  margin-top: 4px;
+}

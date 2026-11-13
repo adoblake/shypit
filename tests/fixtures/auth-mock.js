@@ -40,6 +40,11 @@ export async function installAuthMock(page, options = {}) {
           status: 503,
           json: { error: "Banking services are unavailable." },
         });
+      if (input.action === "start" && state.bankingRequireSignIn)
+        return route.fulfill({
+          status: 403,
+          json: { error: "Please sign in again to continue banking." },
+        });
       if (input.action === "start")
         return route.fulfill({
           json: {

@@ -57,3 +57,38 @@
     width: 100%;
   }
 }
+.banking-steps {
+  padding-left: 22px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.banking-steps li {
+  margin: 8px 0;
+}
+.banking-handoff {
+  padding: 18px;
+  background: var(--pale-teal);
+  border-radius: 12px;
+  margin: 18px 0;
+}
+.banking-handoff a {
+  color: var(--teal);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-weight: 700;
+}
+.banking-return {
+  max-width: 640px;
+  margin: 5vh auto;
+  padding: 32px 24px;
+  line-height: 1.6;
+}
+.banking-return > .brand-lockup {
+  margin-bottom: 44px;
+}
+.banking-return .text-button {
+  min-height: 44px;
+  display: block;
+}
