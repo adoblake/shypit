@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "playwright test",
     "test:production": "node scripts/check-production.mjs",
-    "test:policies": "node scripts/test-access-policies.mjs && node scripts/test-preview-provisioning.mjs && node scripts/test-admin-security.mjs && node scripts/test-banking-security.mjs",
+    "test:policies": "node scripts/test-access-policies.mjs && node scripts/test-preview-provisioning.mjs && node scripts/test-admin-security.mjs && node scripts/test-banking-security.mjs && node scripts/test-marketplace.mjs",
     "record:walkthrough": "node scripts/record-good-case.mjs",
     "encode:walkthrough": "node scripts/encode-walkthrough.mjs",
     "test:auth-server": "node scripts/test-auth-security.mjs && node --test server-tests/*.test.mjs"

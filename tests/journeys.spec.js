@@ -34,6 +34,9 @@ test("driver filters, accepts and completes delivery with proof", async ({
   await installAuthMock(page, { role: "driver" });
   await page.goto("/");
   await signIn(page);
+  await page
+    .getByRole("button", { name: "Practice with sample loads" })
+    .click();
   await page.getByLabel("Route or city").fill("nowhere");
   await expect(page.getByText("No matching loads")).toBeVisible();
   await page.getByLabel("Route or city").fill("");

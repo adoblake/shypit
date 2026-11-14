@@ -23,6 +23,9 @@ import AccountAccess, {
   readRecoveryLink,
 } from "./AccountAccess";
 const Workspace = createContext(null);
+export function useMarket() {
+  return useContext(Workspace).marketRequest;
+}
 export function useBanking() {
   return useContext(Workspace);
 }
@@ -598,6 +601,15 @@ export function AuthGate({ children }) {
         }
       });
   }
+  async function marketRequest(action, body = {}) {
+    const current = accountRef.current;
+    if (!current || !["business", "driver"].includes(current.role))
+      throw Error("Workspace access required");
+    return api("/rest/v1/rpc/shypit_market_" + action, {
+      method: "POST",
+      body: { ...body, p_workspace: current.workspace_id },
+    });
+  }
   async function bankingRequest(action) {
     if (!token.current || !accountRef.current)
       throw Error("Please sign in again.");
@@ -645,6 +657,7 @@ export function AuthGate({ children }) {
           data,
           update,
           bankingRequest,
+          marketRequest,
           prepareBankingReturn: () =>
             rememberBanking(accountRef.current.workspace_id),
           reauthenticateBanking: () => {

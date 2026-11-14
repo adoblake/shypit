@@ -4,15 +4,21 @@ Responsive private freight workspace for businesses and carriers. React + Vite; 
 
 ## Access and setup
 
-**The public Supabase project settings are connected in code; provider and database activation are still required.** There are no shared demo credentials or frontend-only access switches. Email/password is the private-preview entrance. Setup/reset links require email verification; forgotten email addresses require private administrator review. Google and email-code adapters remain disabled pending integration with the same gateway. A verified identity must also have an active administrator-assigned membership before workspace data is loaded.
+**The checked-in public Supabase settings target Shypit’s private pilot. Fresh projects require backend deployment, schema activation, and approved memberships.** There are no shared demo credentials or frontend-only access switches. Email/password is the private-preview entrance. Setup/reset links require email verification; forgotten email addresses require private administrator review. Google and email-code adapters remain disabled pending integration with the same gateway. A verified identity must also have an active administrator-assigned membership before workspace data is loaded.
 
-[Activate the free-plan auth integration](supabase/SETUP.md). Activation requires the Google OAuth client, database schema, and approved memberships in the supplied Supabase project. Public GitHub repository variables can override the checked-in project settings. Privileged secrets stay out of the frontend.
+[Activate the free-plan auth integration](supabase/SETUP.md). Password access requires the authentication gateway, database schema, and approved memberships. Google OAuth remains optional and disabled. Public GitHub repository variables can override the checked-in project settings. Privileged secrets stay out of the frontend.
 
 ## Founder preview
 
 [Set up private access for you and Ronald](docs/preview-access.md). Both founders can be explicitly assigned company and LLC-carrier workspaces; the app lists only server-approved memberships. Passwords are created privately in Shypit after verifying a secure email link. [Activate password setup, recovery and server lockouts](docs/account-recovery.md).
 
 [Watch the admin and team workflow walkthrough](https://adoblake.github.io/shypit/walkthrough/). The 103-second silent, captioned recording includes admin permissions, company booking, mobile LLC-carrier work, and delivery review, with chapter navigation and a portrait carrier clip. It uses fictional accounts and freight; dispatch handoff and payouts are simulated.
+
+## Member load board
+
+Businesses use **Load board** to post freight or prepare a post from an existing shipment. Carriers use **Find loads** to search shared member listings and submit private quotes or fixed-rate requests. A business confirms one carrier; the booking appears in **My jobs**, with exact addresses and contacts released only to the confirmed parties. Posting, requests, booking and cancellation are persisted across workspaces. **Practice with sample loads** retains the earlier simulated journey separately.
+
+[Marketplace setup and security](docs/marketplace.md). New listings are not seeded in production. Real dispatch, shared delivery progression, verification of carrier authority, and payments remain separate work. The existing walkthrough is a scripted preview rather than a recording of this new marketplace.
 
 ## Run
 

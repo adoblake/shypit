@@ -1,3 +1,4 @@
+import Marketplace from "./Marketplace";
 import BankingReturn, { hasBankingReturn } from "./BankingReturn";
 import Banking from "./Banking";
 import Brand from "./Brand";
@@ -66,6 +67,7 @@ function Route({ item }) {
 }
 function App({ account, initialData, initialPage }) {
   const role = account.role;
+  const [listingSeed, setListingSeed] = useState(null);
   const initialShipments = initialData.shipments;
   const loads = initialData.loads;
   const [page, setPage] = useState(
@@ -128,7 +130,7 @@ function App({ account, initialData, initialPage }) {
   const total = shipment.price + (service === "Priority" ? 175 : 0);
   const tabs =
     role === "business"
-      ? ["Shipments", "Package tracking", "Network", "Billing"]
+      ? ["Shipments", "Load board", "Package tracking", "Network", "Billing"]
       : ["Find loads", "My jobs", "Earnings", "Documents"];
   const revealDetails = () => {
     if (window.matchMedia("(max-width: 700px)").matches)
@@ -203,8 +205,15 @@ function App({ account, initialData, initialPage }) {
           {tabs.map((t) => (
             <button
               key={t}
-              className={page === t ? "active" : ""}
-              onClick={() => setPage(t)}
+              className={
+                page === t || (page === "Practice loads" && t === "Find loads")
+                  ? "active"
+                  : ""
+              }
+              onClick={() => {
+                if (t === "Load board") setListingSeed(null);
+                setPage(t);
+              }}
             >
               {t}
             </button>
@@ -218,7 +227,9 @@ function App({ account, initialData, initialPage }) {
       <div className="demo-bar">
         <Info size={16} />
         <span>
-          Private pilot · Sample rates and dates · Workspace access restricted
+          {["Load board", "Find loads", "My jobs"].includes(page)
+            ? "Private pilot · Member bookings · Dispatch and payments not connected"
+            : "Private pilot · Sample rates and dates · Workspace access restricted"}
         </span>
       </div>
       {notice && (
@@ -233,7 +244,15 @@ function App({ account, initialData, initialPage }) {
           </button>
         </div>
       )}
-      {page === "Package tracking" ? (
+      {page === "Load board" || (role === "driver" && page === "Find loads") ? (
+        <Marketplace
+          key={account.workspace_id}
+          account={account}
+          seed={listingSeed}
+          onPractice={() => setPage("Practice loads")}
+          onJobs={() => setPage("My jobs")}
+        />
+      ) : page === "Package tracking" ? (
         <Tracking
           packages={packages}
           setPackages={setPackages}
@@ -432,6 +451,15 @@ function App({ account, initialData, initialPage }) {
                 </p>
               </>
             )}
+            <button
+              className="small-button"
+              onClick={() => {
+                setListingSeed({ ...shipment });
+                setPage("Load board");
+              }}
+            >
+              Post this shipment to load board
+            </button>
             <div className="membership">
               <Buildings size={24} />
               <div>
@@ -444,10 +472,16 @@ function App({ account, initialData, initialPage }) {
             </div>
           </aside>
         </main>
-      ) : role === "driver" && page === "Find loads" ? (
+      ) : role === "driver" && page === "Practice loads" ? (
         <main className="workspace">
           <section className="main-panel">
-            <p className="eyebrow">YOUR NEXT OPPORTUNITY</p>
+            <button
+              className="text-button"
+              onClick={() => setPage("Find loads")}
+            >
+              Back to member load board
+            </button>
+            <p className="eyebrow">PRACTICE LOADS · SAMPLE DATA</p>
             <h1>Find your next good mile.</h1>
             <p className="muted subtitle">
               Clear payouts. Loads that fit your route.
@@ -585,15 +619,18 @@ function App({ account, initialData, initialPage }) {
         <main className="simple-page">
           {role === "driver" && page === "My jobs" ? (
             <>
-              <p className="eyebrow">FROM PICKUP TO PROOF</p>
-              <h1>Your jobs, in motion.</h1>
-              <p className="muted">Manage each stop when safely parked.</p>
+              <Marketplace account={account} bookingsOnly />
+              <h2>Practice jobs</h2>
+              <p className="muted">
+                Sample pickup, proof, and earnings flows. Manage each stop when
+                safely parked.
+              </p>
               {!jobs.length ? (
                 <Empty
-                  title="Your next job starts here"
-                  text="Find a load that fits your equipment and route."
-                  action={() => setPage("Find loads")}
-                  label="Find loads"
+                  title="No practice jobs yet"
+                  text="Practice jobs and illustrative earnings are separate from your member bookings."
+                  action={() => setPage("Practice loads")}
+                  label="Explore practice loads"
                 />
               ) : (
                 jobs.map((j) => (

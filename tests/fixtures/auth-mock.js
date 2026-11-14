@@ -62,6 +62,8 @@ export async function installAuthMock(page, options = {}) {
         },
       });
     }
+    if (path === "/rest/v1/rpc/shypit_market_list")
+      return route.fulfill({ json: [] });
     if (path === "/rest/v1/rpc/shypit_admin_profile")
       return route.fulfill({ json: state.adminProfile || null });
     if (path === "/rest/v1/rpc/shypit_admin_read") {

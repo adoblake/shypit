@@ -313,6 +313,7 @@ try {
       "Sample-only-not-a-real-password!",
     );
     await m.getByRole("button", { name: /Carrier \/ LLC workspace/ }).click();
+    await m.getByRole("button", { name: "Practice with sample loads" }).click();
     await expect(m.getByRole("navigation")).toBeVisible();
     await scene(
       m,
