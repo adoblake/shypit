@@ -113,6 +113,50 @@ try {
     "PASS direct provider sessions cannot access workspaces without a gateway-issued session permit",
   );
   await db.exec("reset role");
+  await db.exec(`set role anon`);
+  await assert.rejects(db.query("select public.shypit_extend_session()"));
+  await db.exec(
+    `reset role;set role authenticated;set "request.jwt.claims"='{"session_id":"${session}","exp":${Math.floor(Date.now() / 1000) + 3600}}'`,
+  );
+  await assert.rejects(db.query("select public.shypit_extend_session()")); // Not in warning window.
+  await db.exec("reset role");
+  for (let extension = 0; extension < 10; extension++) {
+    // Simulate arrival at each warning window without a real-time wait.
+    await db.query(
+      "update shypit_private.session_permits set expires_at=now()+interval '1 minute' where session_id=$1",
+      [session],
+    );
+    await db.exec("set role authenticated");
+    const renewed = (
+      await db.query("select public.shypit_extend_session() as r")
+    ).rows[0].r;
+    assert.ok(renewed.expires_at * 1000 > Date.now() + 170000);
+    assert.ok(renewed.expires_at * 1000 < Date.now() + 190000);
+    await db.exec("reset role");
+  }
+  await db.exec(
+    `set role authenticated;set "request.jwt.claims"='{"session_id":"dddddddd-dddd-4ddd-8ddd-dddddddddddd","exp":${Math.floor(Date.now() / 1000) + 3600}}'`,
+  );
+  await assert.rejects(db.query("select public.shypit_extend_session()"));
+  await db.exec(
+    `reset role;update shypit_private.session_permits set expires_at=now()-interval '1 second';set role authenticated;set "request.jwt.claims"='{"session_id":"${session}","exp":${Math.floor(Date.now() / 1000) + 3600}}'`,
+  );
+  await assert.rejects(db.query("select public.shypit_extend_session()"));
+  await db.exec("reset role");
+  await db.query(
+    "update shypit_private.session_permits set expires_at=now()+interval '1 minute' where session_id=$1",
+    [session],
+  );
+  await db.exec(
+    `set role authenticated;set "request.jwt.claims"='{"session_id":"${session}","exp":${Math.floor(Date.now() / 1000) + 60}}'`,
+  );
+  await assert.rejects(db.query("select public.shypit_extend_session()"));
+  await db.exec(
+    `reset role;set "request.jwt.claims"='{"session_id":"${session}","exp":${Math.floor(Date.now() / 1000) + 3600}}'`,
+  );
+  console.log(
+    "PASS ten explicit warning-window extensions; public, foreign, expired and expiring-token sessions cannot extend",
+  );
   for (let i = 0; i < 10; i++) {
     const a = await begin("sign-in", goodKey);
     await finish(a.reservation, false);
@@ -122,6 +166,7 @@ try {
     (await db.query("select * from public.workspaces")).rows.length,
     0,
   );
+  await assert.rejects(db.query("select public.shypit_extend_session()"));
   await db.exec("reset role");
   console.log(
     "PASS account lock also blocks previously permitted sessions from reading private data",

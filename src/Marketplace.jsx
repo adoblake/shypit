@@ -154,8 +154,11 @@ export default function Marketplace({
       setView("requests");
     }
   }
+  const Root = bookingsOnly ? "section" : "main";
   return (
-    <section
+    <Root
+      id={bookingsOnly ? undefined : "main-content"}
+      tabIndex={bookingsOnly ? undefined : -1}
       className={bookingsOnly ? "market-shell market-bookings" : "market-shell"}
       aria-label={bookingsOnly ? "Load board bookings" : "Member load board"}
     >
@@ -774,14 +777,26 @@ export default function Marketplace({
         Showing up to 100 member listings. This board is separate from practice
         loads and their illustrative earnings.
       </p>
-    </section>
+    </Root>
   );
 }
 function Field({ label, ...props }) {
   return (
     <label>
       {label}
-      <input required {...props} />
+      <input
+        required
+        autoComplete={
+          {
+            business_name: "organization",
+            contact_name: "name",
+            contact_email: "email",
+            contact_phone: "tel",
+            carrier_name: "organization",
+          }[props.name]
+        }
+        {...props}
+      />
     </label>
   );
 }

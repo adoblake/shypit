@@ -23,7 +23,9 @@ export function authConfigPatch(current) {
   const site = "https://adoblake.github.io/shypit/";
   const proposed = {
     site_url: site,
-    jwt_exp: 900,
+    // Database permits still expire in 15 minutes. The provider token leaves
+    // room for explicit, server-checked two-minute accessibility extensions.
+    jwt_exp: 3600,
     disable_signup: true,
     mailer_subjects_invite: "Create your Shypit password",
     mailer_subjects_recovery: "Reset your Shypit password",

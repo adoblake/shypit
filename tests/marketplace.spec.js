@@ -1,6 +1,20 @@
+import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "@playwright/test";
 import { installAuthMock, passwordSignIn } from "./fixtures/auth-mock";
 import { installMarketMock } from "./fixtures/market-mock";
+async function accessible(page) {
+  const result = await new AxeBuilder({ page })
+    .withTags([
+      "wcag2a",
+      "wcag2aa",
+      "wcag21a",
+      "wcag21aa",
+      "wcag22aa",
+      "best-practice",
+    ])
+    .analyze();
+  expect(result.violations).toEqual([]);
+}
 const business = "a1111111-1111-4111-8111-111111111111",
   driver = "b2222222-2222-4222-8222-222222222222";
 async function setup(page, store, id, role) {
@@ -60,7 +74,9 @@ test("business and carrier share post, private quote, confirmed booking and canc
   const store = [];
   await setup(page, store, business, "business");
   await page.getByRole("button", { name: "Load board", exact: true }).click();
+  test.setTimeout(60000);
   await draft(page);
+  await accessible(page);
   expect(store.length).toBe(0);
   await page
     .getByRole("button", { name: "Publish to member load board" })
@@ -87,9 +103,11 @@ test("business and carrier share post, private quote, confirmed booking and canc
     ["Carrier contact phone", "555-010-2000"],
   ])
     await carrier.getByLabel(label, { exact: true }).fill(value);
+  await accessible(carrier);
   await carrier
     .getByRole("button", { name: "Review request", exact: true })
     .click();
+  await accessible(carrier);
   expect(store[0].offers).toHaveLength(0);
   await carrier
     .getByRole("button", { name: "Send request to business" })
@@ -104,6 +122,7 @@ test("business and carrier share post, private quote, confirmed booking and canc
   await expect(
     page.getByText("carrier-private@example.test", { exact: false }),
   ).toHaveCount(0);
+  await accessible(page);
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Confirm carrier booking" }).click();
   await expect(
@@ -113,6 +132,7 @@ test("business and carrier share post, private quote, confirmed booking and canc
     .getByRole("button", { name: "Refresh board", exact: true })
     .click();
   await expect(carrier.getByText("Pickup: 123 Private Dock")).toBeVisible();
+  await accessible(carrier);
   await carrier.screenshot({
     path: `docs/review/market-booking-${info.project.name}.png`,
     fullPage: true,

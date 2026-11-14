@@ -20,7 +20,7 @@ import {
   Plus,
   X,
 } from "@phosphor-icons/react";
-import { AuthGate, useWorkspaceField } from "./auth";
+import { AuthGate, useWorkspaceField, SessionWarning } from "./auth";
 import "./styles.css";
 import Tracking from "./Tracking";
 import { usLocations, nationalShipments } from "./nationwide";
@@ -93,6 +93,7 @@ function App({ account, initialData, initialPage }) {
     if (!modal) return;
     const previous = document.activeElement;
     const dialog = document.querySelector("dialog");
+    if (!dialog.open) dialog.showModal();
     const focusable = () =>
       [...dialog.querySelectorAll("button,input,select,[href]")].filter(
         (el) => !el.disabled,
@@ -122,9 +123,15 @@ function App({ account, initialData, initialPage }) {
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = old;
-      previous?.focus();
+      if (dialog.open) dialog.close();
+      if (previous?.isConnected) previous.focus();
     };
   }, [modal]);
+  useEffect(() => {
+    document.title = `${page} | Shypit`;
+    document.getElementById("main-content")?.focus();
+    window.scrollTo(0, 0);
+  }, [page]);
   const shipment = shipments.find((s) => s.id === selected) ?? shipments[0],
     load = loads.find((s) => s.id === selectedLoad) ?? loads[0];
   const total = shipment.price + (service === "Priority" ? 175 : 0);
@@ -205,6 +212,11 @@ function App({ account, initialData, initialPage }) {
           {tabs.map((t) => (
             <button
               key={t}
+              aria-current={
+                page === t || (page === "Practice loads" && t === "Find loads")
+                  ? "page"
+                  : undefined
+              }
               className={
                 page === t || (page === "Practice loads" && t === "Find loads")
                   ? "active"
@@ -224,7 +236,7 @@ function App({ account, initialData, initialPage }) {
           <span>{account.display_name || account.email}</span>
         </div>
       </header>
-      <div className="demo-bar">
+      <div className="demo-bar" role="region" aria-label="Pilot status">
         <Info size={16} />
         <span>
           {["Load board", "Find loads", "My jobs"].includes(page)
@@ -260,7 +272,7 @@ function App({ account, initialData, initialPage }) {
           onFreight={() => setPage("Shipments")}
         />
       ) : role === "business" && page === "Shipments" ? (
-        <main className="workspace">
+        <main id="main-content" tabIndex={-1} className="workspace">
           <section className="main-panel">
             <div className="heading-row">
               <div>
@@ -314,6 +326,7 @@ function App({ account, initialData, initialPage }) {
               {shipments.map((s) => (
                 <button
                   key={s.id}
+                  aria-pressed={shipment.id === s.id}
                   className={
                     "shipment-row " + (shipment.id === s.id ? "selected" : "")
                   }
@@ -473,7 +486,7 @@ function App({ account, initialData, initialPage }) {
           </aside>
         </main>
       ) : role === "driver" && page === "Practice loads" ? (
-        <main className="workspace">
+        <main id="main-content" tabIndex={-1} className="workspace">
           <section className="main-panel">
             <button
               className="text-button"
@@ -508,10 +521,10 @@ function App({ account, initialData, initialPage }) {
                 </select>
               </label>
             </div>
-            <h3>
+            <h2>
               {filtered.length} available{" "}
               {filtered.length === 1 ? "load" : "loads"}
-            </h3>
+            </h2>
             <div className="load-list">
               {filtered.map((l) => (
                 <button
@@ -519,6 +532,7 @@ function App({ account, initialData, initialPage }) {
                     "load-row " + (selectedLoad === l.id ? "selected" : "")
                   }
                   key={l.id}
+                  aria-pressed={selectedLoad === l.id}
                   onClick={() => {
                     setSelectedLoad(l.id);
                     revealDetails();
@@ -616,7 +630,7 @@ function App({ account, initialData, initialPage }) {
           </aside>
         </main>
       ) : (
-        <main className="simple-page">
+        <main id="main-content" tabIndex={-1} className="simple-page">
           {role === "driver" && page === "My jobs" ? (
             <>
               <Marketplace account={account} bookingsOnly />
@@ -746,7 +760,7 @@ function App({ account, initialData, initialPage }) {
                 <div className="document" key={t}>
                   <FileText size={28} />
                   <div>
-                    <h3>{t}</h3>
+                    <h2>{t}</h2>
                     <p>Not connected · secure verification coming later</p>
                   </div>
                 </div>
@@ -829,10 +843,11 @@ function App({ account, initialData, initialPage }) {
           }}
         >
           <dialog
-            open
+            aria-modal="true"
             aria-labelledby="modal-title"
             onCancel={() => setModal(null)}
           >
+            <SessionWarning />
             <button
               className="close"
               aria-label="Close dialog"
@@ -1047,11 +1062,16 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
   );
 }
 createRoot(document.getElementById("root")).render(
-  hasBankingReturn() ? (
-    <BankingReturn>
+  <>
+    <a className="skip-link" href="#main-content">
+      Skip to main content
+    </a>
+    {hasBankingReturn() ? (
+      <BankingReturn>
+        <AuthGate>{(props) => <App {...props} />}</AuthGate>
+      </BankingReturn>
+    ) : (
       <AuthGate>{(props) => <App {...props} />}</AuthGate>
-    </BankingReturn>
-  ) : (
-    <AuthGate>{(props) => <App {...props} />}</AuthGate>
-  ),
+    )}
+  </>,
 );

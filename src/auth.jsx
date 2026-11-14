@@ -4,6 +4,7 @@ import {
   clearBankingDestination,
 } from "./banking-return";
 import Brand from "./Brand";
+import SessionRenewal from "./SessionRenewal";
 import Admin from "./Admin";
 import React, {
   createContext,
@@ -23,6 +24,33 @@ import AccountAccess, {
   readRecoveryLink,
 } from "./AccountAccess";
 const Workspace = createContext(null);
+export function SessionWarning() {
+  const { session } = useContext(Workspace);
+  return (
+    <>
+      {session.warning && (
+        <section
+          className="session-warning"
+          aria-label="Session expiry warning"
+        >
+          <p role="alert">
+            Your secure session ends in about two minutes. Choose Keep working
+            to add two minutes, or sign in again for a new session.
+          </p>
+          <button onClick={session.extend} disabled={session.extending}>
+            {session.extending ? "Extending…" : "Keep working"}
+          </button>
+          <button onClick={session.renew}>Sign in again</button>
+        </section>
+      )}
+      {session.message && (
+        <p className="session-extension" role="status">
+          {session.message}
+        </p>
+      )}
+    </>
+  );
+}
 export function useMarket() {
   return useContext(Workspace).marketRequest;
 }
@@ -72,6 +100,11 @@ function validData(d) {
   );
 }
 export function AuthGate({ children }) {
+  const [extending, setExtending] = useState(false);
+  const [extensionMessage, setExtensionMessage] = useState("");
+  const [sessionWarning, setSessionWarning] = useState(false);
+  const [sessionLocked, setSessionLocked] = useState(false);
+  const [renewOpen, setRenewOpen] = useState(false);
   const [loginKind, setLoginKind] = useState("workspace");
   const [initialPage, setInitialPage] = useState(null);
   const [adminProfile, setAdminProfile] = useState(null);
@@ -102,6 +135,14 @@ export function AuthGate({ children }) {
     );
     return () => clearTimeout(timer);
   }, [signInLocked]);
+  useEffect(() => {
+    if (!sessionLocked) return;
+    const previousTitle = document.title;
+    document.title = "Session locked | Shypit";
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [sessionLocked]);
   const callbackHandled = useRef(false);
   const token = useRef(null),
     accountRef = useRef(null),
@@ -113,6 +154,16 @@ export function AuthGate({ children }) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [account]);
+  const firstAuthView = useRef(true);
+  useEffect(() => {
+    if (!account)
+      document.title = `${recovery ? "Choose your password" : accessMode === "email-help" ? "Account email help" : accessMode === "setup" ? "Create your password" : accessMode === "reset" ? "Reset your password" : pendingUser ? "Choose your workspace" : loginKind === "admin" ? "Admin sign-in" : "Sign in"} | Shypit`;
+    if (firstAuthView.current) {
+      firstAuthView.current = false;
+      return;
+    }
+    if (!account) document.querySelector(".auth-form h1")?.focus();
+  }, [accessMode, recovery, pendingUser, loginKind, account]);
   useEffect(() => {
     const controller = new AbortController();
     fetch(new URL("auth-config.json", document.baseURI), {
@@ -192,6 +243,10 @@ export function AuthGate({ children }) {
     accountRef.current = null;
     expires.current = 0;
     setAccount(null);
+    setSessionWarning(false);
+    setSessionLocked(false);
+    setRenewOpen(false);
+    setExtensionMessage("");
     setPendingUser(null);
     setMemberships([]);
     setAdminProfile(null);
@@ -223,7 +278,7 @@ export function AuthGate({ children }) {
       }
   }
   useEffect(() => {
-    if (!account) return;
+    if (!account || sessionLocked) return;
     let last = Date.now();
     const mark = () => {
       last = Date.now();
@@ -231,8 +286,21 @@ export function AuthGate({ children }) {
     for (const name of ["pointerdown", "keydown", "touchstart"])
       window.addEventListener(name, mark, { passive: true });
     const check = () => {
-      if (Date.now() >= expires.current || Date.now() - last >= 15 * 60 * 1000)
-        signOut("Your session ended. Sign in again to continue.");
+      const remaining = Math.min(
+        expires.current - Date.now(),
+        15 * 60 * 1000 - (Date.now() - last),
+      );
+      setSessionWarning(remaining > 0 && remaining <= 120000);
+      if (remaining <= 0) {
+        const old = token.current;
+        token.current = null;
+        setSessionLocked(true);
+        setRenewOpen(true);
+        if (old)
+          accountRequest(config, { action: "logout", accessToken: old }).catch(
+            () => {},
+          );
+      }
     };
     const timer = setInterval(check, 1000);
     document.addEventListener("visibilitychange", check);
@@ -242,11 +310,13 @@ export function AuthGate({ children }) {
       for (const name of ["pointerdown", "keydown", "touchstart"])
         window.removeEventListener(name, mark);
     };
-  }, [account]);
+  }, [account, sessionLocked]);
   useEffect(() => {
-    if (!account) return;
+    if (!account || sessionLocked) return;
     const current = epoch.current;
     const checkMembership = async () => {
+      const checkingToken = token.current;
+      if (!checkingToken || Date.now() >= expires.current) return;
       try {
         if (account.role === "admin") {
           const profile = await adminRequest("shypit_admin_profile", {});
@@ -268,7 +338,11 @@ export function AuthGate({ children }) {
         )
           throw Error();
       } catch {
-        if (current === epoch.current)
+        if (
+          current === epoch.current &&
+          checkingToken === token.current &&
+          Date.now() < expires.current
+        )
           signOut(
             "Your workspace access changed. Contact your administrator before signing in again.",
           );
@@ -283,7 +357,108 @@ export function AuthGate({ children }) {
       clearInterval(timer);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [account]);
+  }, [account, sessionLocked]);
+  async function extendSession() {
+    if (extending || sessionLocked) return;
+    setExtending(true);
+    const parentDialog = document.activeElement?.closest("dialog");
+    const attempt = epoch.current;
+    try {
+      const result = await api("/rest/v1/rpc/shypit_extend_session", {
+        method: "POST",
+        body: {},
+      });
+      if (attempt !== epoch.current || !token.current) return;
+      const end = Number(result?.expires_at) * 1000;
+      if (
+        !Number.isFinite(end) ||
+        end <= expires.current ||
+        end > Date.now() + 241000
+      )
+        throw Error();
+      expires.current = end;
+      setSessionWarning(false);
+      setExtensionMessage(
+        "Session extended by two minutes. Your work stays open.",
+      );
+      requestAnimationFrame(() => {
+        const target =
+          parentDialog?.querySelector("input, select, .close") ||
+          document.getElementById("main-content");
+        target?.focus();
+      });
+    } catch {
+      if (attempt === epoch.current) setRenewOpen(true);
+    } finally {
+      setExtending(false);
+    }
+  }
+  async function renewSession(password) {
+    const current = accountRef.current;
+    const attempt = epoch.current;
+    let fresh;
+    try {
+      fresh = await accountRequest(config, {
+        action: "signin",
+        email: current.email,
+        password,
+      });
+      const user = await api("/auth/v1/user", { access: fresh.access_token });
+      if (user.id !== current.userId) throw Error("Identity changed");
+      if (current.role === "admin") {
+        const profile = await api("/rest/v1/rpc/shypit_admin_profile", {
+          method: "POST",
+          body: {},
+          access: fresh.access_token,
+        });
+        if (!profile?.capabilities?.length) throw Error("Access changed");
+        setAdminProfile(profile);
+      } else {
+        const members = await api(
+          "/rest/v1/memberships?select=workspace_id,role,display_name&user_id=eq." +
+            encodeURIComponent(user.id) +
+            "&active=eq.true",
+          { access: fresh.access_token },
+        );
+        if (
+          !members.some(
+            (m) =>
+              m.workspace_id === current.workspace_id &&
+              m.role === current.role,
+          )
+        )
+          throw Error("Access changed");
+      }
+      if (attempt !== epoch.current) throw Error("Session changed");
+      const old = token.current;
+      token.current = fresh.access_token;
+      expires.current = Math.min(fresh.expires_at * 1000, Date.now() + 900000);
+      setSessionLocked(false);
+      setSessionWarning(false);
+      setRenewOpen(false);
+      // Change the account reference to restart the inactivity clock without remounting the workflow.
+      setAccount({ ...current });
+      if (old && old !== fresh.access_token)
+        accountRequest(config, { action: "logout", accessToken: old }).catch(
+          () => {},
+        );
+    } catch (e) {
+      if (fresh?.access_token)
+        accountRequest(config, {
+          action: "logout",
+          accessToken: fresh.access_token,
+        }).catch(() => {});
+      if (e.status === 429)
+        setSignInLocked(
+          e.lockedUntil || new Date(Date.now() + 86400000).toISOString(),
+        );
+      throw Error(
+        e.status === 429
+          ? e.message
+          : "Unable to renew your session. Check your password and workspace access, or return to sign-in for account help.",
+      );
+    }
+  }
   async function sendCode(e) {
     e.preventDefault();
     if (busy || !configured || accountService !== "ready") return;
@@ -656,6 +831,13 @@ export function AuthGate({ children }) {
         value={{
           data,
           update,
+          session: {
+            warning: sessionWarning,
+            extending,
+            message: extensionMessage,
+            extend: extendSession,
+            renew: () => setRenewOpen(true),
+          },
           bankingRequest,
           marketRequest,
           prepareBankingReturn: () =>
@@ -669,71 +851,84 @@ export function AuthGate({ children }) {
           },
         }}
       >
-        <div className="session-strip">
-          <span>
-            <ShieldCheck size={17} />
-            Signed in as {account.display_name || account.email} ·{" "}
-            {account.role === "admin"
-              ? "Admin"
-              : account.role === "business"
-                ? "Business"
-                : "Carrier"}
-          </span>
-          <span role="status">{saveState}</span>
-          {memberships.length > 1 && (
-            <button onClick={switchWorkspace} disabled={busy}>
-              Switch workspace
-            </button>
-          )}
-          {account.role !== "admin" &&
-            memberships.some((member) => member.role === "admin") && (
-              <button
-                disabled={busy}
-                onClick={async () => {
-                  setBusy(true);
-                  await queue.current;
-                  if (!token.current || !accountRef.current) {
-                    setBusy(false);
-                    return;
-                  }
-                  await openWorkspace(
-                    memberships.find((member) => member.role === "admin"),
-                    {
-                      id: accountRef.current.userId,
-                      email: accountRef.current.email,
-                    },
-                  );
-                }}
-              >
-                Admin Login
+        <div className="signed-in-workspace" hidden={sessionLocked}>
+          <section className="session-strip" aria-label="Account session">
+            <span>
+              <ShieldCheck size={17} />
+              Signed in as {account.display_name || account.email} ·{" "}
+              {account.role === "admin"
+                ? "Admin"
+                : account.role === "business"
+                  ? "Business"
+                  : "Carrier"}
+            </span>
+            <span role="status">{saveState}</span>
+            {memberships.length > 1 && (
+              <button onClick={switchWorkspace} disabled={busy}>
+                Switch workspace
               </button>
             )}
-          <button onClick={() => signOut()}>
-            <SignOut size={18} />
-            Sign out
-          </button>
+            {account.role !== "admin" &&
+              memberships.some((member) => member.role === "admin") && (
+                <button
+                  disabled={busy}
+                  onClick={async () => {
+                    setBusy(true);
+                    await queue.current;
+                    if (!token.current || !accountRef.current) {
+                      setBusy(false);
+                      return;
+                    }
+                    await openWorkspace(
+                      memberships.find((member) => member.role === "admin"),
+                      {
+                        id: accountRef.current.userId,
+                        email: accountRef.current.email,
+                      },
+                    );
+                  }}
+                >
+                  Admin Login
+                </button>
+              )}
+            <button onClick={() => signOut()}>
+              <SignOut size={18} />
+              Sign out
+            </button>
+          </section>
+          <SessionWarning />
+          {error && (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          )}
+          {account.role === "admin" ? (
+            <Admin
+              request={adminRequest}
+              profile={adminProfile}
+              onAccessChanged={async () => {
+                try {
+                  const p = await adminRequest("shypit_admin_profile", {});
+                  if (!p) await signOut("Your admin access changed.");
+                  else setAdminProfile(p);
+                } catch {
+                  await signOut("Please sign in again.");
+                }
+              }}
+            />
+          ) : (
+            children({ account, initialData: data, initialPage })
+          )}
         </div>
-        {error && (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        )}
-        {account.role === "admin" ? (
-          <Admin
-            request={adminRequest}
-            profile={adminProfile}
-            onAccessChanged={async () => {
-              try {
-                const p = await adminRequest("shypit_admin_profile", {});
-                if (!p) await signOut("Your admin access changed.");
-                else setAdminProfile(p);
-              } catch {
-                await signOut("Please sign in again.");
-              }
-            }}
+        {renewOpen && (
+          <SessionRenewal
+            locked={sessionLocked}
+            onRenew={renewSession}
+            onClose={() => setRenewOpen(false)}
+            onSignOut={() => signOut()}
+            email={account.email}
+            blocked={Boolean(signInLocked)}
           />
-        ) : (
-          children({ account, initialData: data, initialPage })
         )}
       </Workspace.Provider>
     );
@@ -745,11 +940,11 @@ export function AuthGate({ children }) {
         </a>
         <div>
           <p className="eyebrow">YOUR PEOPLE. YOUR FREIGHT.</p>
-          <h1>
+          <p className="auth-story-title">
             Good work starts
             <br />
             with trust.
-          </h1>
+          </p>
           <p>
             A private workspace for your shipping team and the carriers who keep
             it moving.
@@ -760,7 +955,7 @@ export function AuthGate({ children }) {
           Invitation-only access
         </span>
       </section>
-      <section className="auth-form-panel">
+      <section className="auth-form-panel" id="main-content" tabIndex={-1}>
         <div className="auth-form">
           <span className="auth-lock">
             <LockKey size={30} />
@@ -768,7 +963,7 @@ export function AuthGate({ children }) {
           {!(accessMode || recovery) && (
             <>
               <p className="eyebrow">WELCOME TO SHYPIT</p>
-              <h2>
+              <h1 tabIndex={-1}>
                 {pendingUser ? (
                   "Choose your workspace."
                 ) : loginKind === "admin" ? (
@@ -781,7 +976,7 @@ export function AuthGate({ children }) {
                     <span className="auth-mobile-copy">Sign in.</span>
                   </>
                 )}
-              </h2>
+              </h1>
               <p className="muted">
                 <span className="auth-desktop-copy">
                   {loginKind === "admin"
@@ -905,6 +1100,7 @@ export function AuthGate({ children }) {
                   <label htmlFor="login-email">Email address</label>
                   <input
                     id="login-email"
+                    aria-describedby={error ? "login-error" : undefined}
                     type="email"
                     autoComplete="username"
                     required
@@ -929,6 +1125,7 @@ export function AuthGate({ children }) {
                   <div className="password-input">
                     <input
                       id="login-password"
+                      aria-describedby={error ? "login-error" : undefined}
                       type={showPassword ? "text" : "password"}
                       autoComplete="current-password"
                       required
@@ -1022,7 +1219,7 @@ export function AuthGate({ children }) {
                 </>
               )}
               {error && !config.emailOtpEnabled && (
-                <p role="alert" className="error">
+                <p role="alert" className="error" id="login-error">
                   {error}
                 </p>
               )}
@@ -1072,7 +1269,7 @@ export function AuthGate({ children }) {
                     </p>
                   )}
                   {error && (
-                    <p role="alert" className="error">
+                    <p role="alert" className="error" id="login-error">
                       {error}
                     </p>
                   )}
@@ -1116,11 +1313,12 @@ export function AuthGate({ children }) {
           <p className="auth-note">
             <LockKey />
             <span className="auth-desktop-copy">
-              Sessions end after 15 minutes of inactivity. Signing in again is
-              required after a refresh.
+              Sessions lock after 15 minutes. A warning lets you extend your
+              session or sign in again without losing your open form. Refreshing
+              clears unsaved work.
             </span>
             <span className="auth-mobile-copy">
-              Sessions end after 15 minutes or a refresh.
+              15-minute sessions. Sign in again to keep working.
             </span>
           </p>
         </div>

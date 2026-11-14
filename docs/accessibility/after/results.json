@@ -1,0 +1,241 @@
+[
+  {
+    "step": 1,
+    "name": "desktop-signin",
+    "screenshot": "docs/accessibility/after/01-desktop-signin.png",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "step": 2,
+    "name": "desktop-account-setup",
+    "screenshot": "docs/accessibility/after/02-desktop-account-setup.png",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "step": 3,
+    "name": "desktop-shipments",
+    "screenshot": "docs/accessibility/after/03-desktop-shipments.png",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 7
+      }
+    ]
+  },
+  {
+    "step": 4,
+    "name": "desktop-shipment-dialog",
+    "screenshot": "docs/accessibility/after/04-desktop-shipment-dialog.png",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "step": 5,
+    "name": "desktop-market-form",
+    "screenshot": "docs/accessibility/after/05-desktop-market-form.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 6,
+    "name": "desktop-tracking",
+    "screenshot": "docs/accessibility/after/06-desktop-tracking.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 7,
+    "name": "desktop-billing",
+    "screenshot": "docs/accessibility/after/07-desktop-billing.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 8,
+    "name": "desktop-carrier-board",
+    "screenshot": "docs/accessibility/after/08-desktop-carrier-board.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 9,
+    "name": "desktop-practice-loads",
+    "screenshot": "docs/accessibility/after/09-desktop-practice-loads.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 10,
+    "name": "desktop-jobs",
+    "screenshot": "docs/accessibility/after/10-desktop-jobs.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 11,
+    "name": "desktop-earnings",
+    "screenshot": "docs/accessibility/after/11-desktop-earnings.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 12,
+    "name": "desktop-admin-overview",
+    "screenshot": "docs/accessibility/after/12-desktop-admin-overview.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 13,
+    "name": "desktop-admin-access",
+    "screenshot": "docs/accessibility/after/13-desktop-admin-access.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 14,
+    "name": "desktop-walkthrough",
+    "screenshot": "docs/accessibility/after/14-desktop-walkthrough.png",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "step": 15,
+    "name": "mobile-signin",
+    "screenshot": "docs/accessibility/after/15-mobile-signin.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 16,
+    "name": "mobile-account-setup",
+    "screenshot": "docs/accessibility/after/16-mobile-account-setup.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 17,
+    "name": "mobile-shipments",
+    "screenshot": "docs/accessibility/after/17-mobile-shipments.png",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 7
+      }
+    ]
+  },
+  {
+    "step": 18,
+    "name": "mobile-shipment-dialog",
+    "screenshot": "docs/accessibility/after/18-mobile-shipment-dialog.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 19,
+    "name": "mobile-market-form",
+    "screenshot": "docs/accessibility/after/19-mobile-market-form.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 20,
+    "name": "mobile-tracking",
+    "screenshot": "docs/accessibility/after/20-mobile-tracking.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 21,
+    "name": "mobile-billing",
+    "screenshot": "docs/accessibility/after/21-mobile-billing.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 22,
+    "name": "mobile-carrier-board",
+    "screenshot": "docs/accessibility/after/22-mobile-carrier-board.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 23,
+    "name": "mobile-practice-loads",
+    "screenshot": "docs/accessibility/after/23-mobile-practice-loads.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 24,
+    "name": "mobile-jobs",
+    "screenshot": "docs/accessibility/after/24-mobile-jobs.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 25,
+    "name": "mobile-earnings",
+    "screenshot": "docs/accessibility/after/25-mobile-earnings.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 26,
+    "name": "mobile-admin-overview",
+    "screenshot": "docs/accessibility/after/26-mobile-admin-overview.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 27,
+    "name": "mobile-admin-access",
+    "screenshot": "docs/accessibility/after/27-mobile-admin-access.png",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "step": 28,
+    "name": "mobile-walkthrough",
+    "screenshot": "docs/accessibility/after/28-mobile-walkthrough.png",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  }
+]

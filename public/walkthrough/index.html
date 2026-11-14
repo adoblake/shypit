@@ -55,7 +55,7 @@
         margin: 10px 0 20px;
       }
       .eyebrow {
-        color: #087f78;
+        color: #066c66;
         font-size: 12px;
         letter-spacing: 1.4px;
         font-weight: 700;
@@ -69,7 +69,7 @@
         margin: 26px 0 20px;
       }
       a {
-        color: #087f78;
+        color: #066c66;
       }
       .note {
         color: #52646a;
@@ -111,20 +111,37 @@
       #chapters button {
         font: inherit;
         font-size: 14px;
-        color: #087f78;
+        color: #066c66;
         background: #e7f3f0;
         border: 1px solid #b4c9c5;
         border-radius: 10px;
         padding: 10px 14px;
         cursor: pointer;
       }
-      #chapters button:focus-visible {
+      :focus-visible {
         outline: 3px solid #087f78;
         outline-offset: 3px;
+      }
+      .skip-link {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        padding: 12px 18px;
+        background: white;
+        color: #101d32;
+        z-index: 10;
+        transform: translateY(-180%);
+      }
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+      main:focus {
+        outline-offset: -4px;
       }
     </style>
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <header>
       <a class="brand" href="../"
         ><img
@@ -134,7 +151,7 @@
           height="40" /></a
       ><a href="../">Back to sign-in</a>
     </header>
-    <main>
+    <main id="main-content" tabindex="-1">
       <p class="eyebrow">ADMIN & TEAM WORKFLOW WALKTHROUGH</p>
       <h1>See Shypit from every side.</h1>
       <p>
@@ -146,7 +163,8 @@
         playsinline
         preload="metadata"
         poster="workflow-poster.jpg?v=all-sides-v3"
-        aria-label="Captioned admin and sample shipment walkthrough"
+        aria-label="Silent admin and sample shipment walkthrough"
+        aria-describedby="video-alternative"
       >
         <source src="shypit-good-case.mp4?v=all-sides-v3" type="video/mp4" />
         Your browser cannot play this video.
@@ -174,38 +192,70 @@
         recording.
       </p>
       <details>
-        <summary>Read the walkthrough</summary>
+        <summary id="video-alternative">
+          Read the full text alternative (silent video)
+        </summary>
         <ol>
           <li>
             <strong>Admin:</strong> Enter through Admin Login, review pilot
             counts, assign Overview-only access and separate company finance
             access, and inspect the audit history. Founder accounts remain
-            protected.
+            protected. The owner checks “Admin access enabled” and “Overview,”
+            chooses “Review admin changes,” and confirms the reviewed
+            permissions. “Grant finance access” gives the same teammate
+            permission for their company workspace. Audit history shows both
+            changes. Overview record counts are sample activity, not revenue or
+            verified deliveries.
           </li>
           <li>
             <strong>Business posting:</strong> Cedar Supply Co. posts eight
             pallets of office supplies from Phoenix to Harbor Office Goods in
             Los Angeles. The member listing shows the city route and cargo;
-            exact addresses and contacts remain private.
+            exact addresses and contacts remain private. The business chooses
+            “Post a shipment,” enters the route, pickup and delivery dates,
+            cargo, pallet count, weight, and equipment, then selects private
+            quotes. A separate private section holds the pickup and delivery
+            street addresses and shipping contact. “Review listing” presents a
+            summary; “Publish to member load board” posts it for approved
+            carrier members. A confirmation reports that the shipment is posted.
           </li>
           <li>
             <strong>Carrier on mobile:</strong> Open Road Logistics LLC uses the
             compact sign-in, filters member loads, reviews the freight, and
             submits a private $920 quote. The business must confirm it before it
-            becomes a booking.
+            becomes a booking. The carrier signs in with its invited email and
+            password, searches the route and equipment, opens the listing, and
+            reviews its public details. Street addresses and shipping contacts
+            are unavailable at this stage. The carrier enters the LLC name, $920
+            quote, and contact details, reviews the request, and submits it. The
+            request is marked pending, not confirmed.
           </li>
           <li>
             <strong>Business confirmation and banking:</strong> The shipper
             reviews and confirms the carrier. The selected parties gain access
             to booking contacts. Finance-authorized staff start test-mode
             payment-account setup in Billing; Stripe handles verification
-            separately.
+            separately. The business opens the shipment’s carrier requests,
+            reviews the $920 private quote, and selects “Confirm carrier
+            booking.” A confirmation prompt is accepted. The listing becomes
+            booked and private addresses and contacts are available to the
+            selected parties. Credentials and shipment terms still require
+            separate verification. In Billing, “Add payment account” is the
+            entry to hosted setup; the recording stops before external
+            verification and charges.
           </li>
           <li>
             <strong>Carrier jobs and banking:</strong> The carrier sees the
             confirmed job and private shipment details in My jobs, then reviews
             the test-mode payout setup in Earnings. No delivery, dispatch, or
-            payout is completed.
+            payout is completed. In My jobs, the carrier opens the booked
+            shipment and reads “Private booking details,” including pickup,
+            delivery, and shipping contact. In Earnings, “Connect payout
+            account” starts provider-hosted setup in a separate tab. Bank
+            numbers belong on Stripe’s hosted page. Returning to Shypit checks
+            provider status; an expired session can resume banking after
+            sign-in. The finished example is post → private quote → confirmation
+            → shared job.
           </li>
         </ol>
       </details>

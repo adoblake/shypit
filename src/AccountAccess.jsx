@@ -141,7 +141,7 @@ export default function AccountAccess({
   return (
     <>
       <p className="eyebrow">PRIVATE ACCOUNT ACCESS</p>
-      <h2>{title}</h2>
+      <h1 tabIndex={-1}>{title}</h1>
       <p className="muted">
         {setting
           ? "Verify the invited email address, then choose a strong, unique password."
@@ -191,6 +191,7 @@ export default function AccountAccess({
               <label htmlFor="new-password">New password</label>
               <input
                 id="new-password"
+                aria-describedby="password-help"
                 required
                 type="password"
                 autoComplete="new-password"
@@ -202,6 +203,10 @@ export default function AccountAccess({
               <label htmlFor="confirm-password">Confirm new password</label>
               <input
                 id="confirm-password"
+                aria-describedby={
+                  error ? "account-error password-help" : "password-help"
+                }
+                aria-invalid={Boolean(error && password !== confirm)}
                 required
                 type="password"
                 autoComplete="new-password"
@@ -210,7 +215,7 @@ export default function AccountAccess({
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
               />
-              <p className="helper">
+              <p className="helper" id="password-help">
                 Use 12–128 characters. Your password is sent securely to the
                 identity provider and is never saved in browser storage.
               </p>
@@ -238,7 +243,7 @@ export default function AccountAccess({
         </p>
       )}
       {error && (
-        <p className="error" role="alert">
+        <p className="error" role="alert" id="account-error">
           {error}
         </p>
       )}

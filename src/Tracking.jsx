@@ -115,7 +115,7 @@ export default function Tracking({
     </label>
   );
   return (
-    <main className="tms">
+    <main id="main-content" tabIndex={-1} className="tms">
       <div className="heading-row">
         <div>
           <p className="eyebrow">TRANSPORTATION MANAGEMENT</p>

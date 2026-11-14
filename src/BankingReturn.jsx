@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Brand from "./Brand";
 import { rememberBanking } from "./banking-return";
 export function hasBankingReturn() {
@@ -8,6 +8,9 @@ export function hasBankingReturn() {
 }
 export default function BankingReturn({ children }) {
   const [continueHere, setContinueHere] = useState(false);
+  useEffect(() => {
+    if (!continueHere) document.title = "Return to banking setup | Shypit";
+  }, [continueHere]);
   if (continueHere) return children;
   const params = new URLSearchParams(location.search),
     state = params.get("banking");
@@ -18,7 +21,7 @@ export default function BankingReturn({ children }) {
     setContinueHere(true);
   }
   return (
-    <main className="banking-return">
+    <main id="main-content" tabIndex={-1} className="banking-return">
       <Brand />
       <p className="eyebrow">BACK TO SHYPIT</p>
       <h1>

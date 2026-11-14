@@ -1,0 +1,1859 @@
+[
+  {
+    "step": 1,
+    "name": "desktop-signin",
+    "screenshot": "docs/accessibility/before/01-desktop-signin.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".auth-form > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">WELCOME TO SHYPIT</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "step": 2,
+    "name": "desktop-account-setup",
+    "screenshot": "docs/accessibility/before/02-desktop-account-setup.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".auth-form > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">PRIVATE ACCOUNT ACCESS</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "step": 3,
+    "name": "desktop-shipments",
+    "screenshot": "docs/accessibility/before/03-desktop-shipments.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "div > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR SHIPPING WORKSPACE</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".selected > .route-cell > small"
+            ],
+            "html": "<small>SHP-1042</small>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #67717b, background color: #e7f3f0, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".footnote"
+            ],
+            "html": "<p class=\"footnote\">",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.87 (foreground color: #71817e, background color: #faf9f6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "aside > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">SHIPMENT DETAILS · SHP-1042</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".session-strip > span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 7
+      }
+    ]
+  },
+  {
+    "step": 4,
+    "name": "desktop-shipment-dialog",
+    "screenshot": "docs/accessibility/before/04-desktop-shipment-dialog.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "div > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR SHIPPING WORKSPACE</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".selected > .route-cell > small"
+            ],
+            "html": "<small>SHP-1042</small>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #67717b, background color: #e7f3f0, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".footnote"
+            ],
+            "html": "<p class=\"footnote\">",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.87 (foreground color: #71817e, background color: #faf9f6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "aside > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">SHIPMENT DETAILS · SHP-1042</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "form > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">LET’S GET IT MOVING</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".session-strip > span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 8
+      }
+    ]
+  },
+  {
+    "step": 5,
+    "name": "desktop-market-form",
+    "screenshot": "docs/accessibility/before/05-desktop-market-form.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR PEOPLE. YOUR NEXT OPPORTUNITY.</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "description": "Document should have one main landmark",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "html"
+            ],
+            "html": "<html lang=\"en\">",
+            "summary": "Fix all of the following:\n  Document does not have a main landmark"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Member bookings · Dispatch and payments not connected</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 6,
+    "name": "desktop-tracking",
+    "screenshot": "docs/accessibility/before/06-desktop-tracking.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "div > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">TRANSPORTATION MANAGEMENT</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".national-intro > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">PARTNER TEST DRIVE · PACKAGES + FREIGHT</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.31 (foreground color: #647779, background color: #edf7f5, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 7,
+    "name": "desktop-billing",
+    "screenshot": "docs/accessibility/before/07-desktop-billing.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">SIMPLE, TRANSPARENT COSTS</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".session-strip > span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 8,
+    "name": "desktop-carrier-board",
+    "screenshot": "docs/accessibility/before/08-desktop-carrier-board.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR PEOPLE. YOUR NEXT OPPORTUNITY.</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "description": "Document should have one main landmark",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "html"
+            ],
+            "html": "<html lang=\"en\">",
+            "summary": "Fix all of the following:\n  Document does not have a main landmark"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Member bookings · Dispatch and payments not connected</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 9,
+    "name": "desktop-practice-loads",
+    "screenshot": "docs/accessibility/before/09-desktop-practice-loads.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "section > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">PRACTICE LOADS · SAMPLE DATA</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "aside > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">LOAD DETAILS · LOAD-201</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "description": "Heading levels should only increase by one",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "h3"
+            ],
+            "html": "<h3>5 available loads</h3>",
+            "summary": "Fix any of the following:\n  Heading order invalid"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 10,
+    "name": "desktop-jobs",
+    "screenshot": "docs/accessibility/before/10-desktop-jobs.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">SHARED LOAD BOARD</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Member bookings · Dispatch and payments not connected</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 11,
+    "name": "desktop-earnings",
+    "screenshot": "docs/accessibility/before/11-desktop-earnings.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">EVERY MILE COUNTS</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 12,
+    "name": "desktop-admin-overview",
+    "screenshot": "docs/accessibility/before/12-desktop-admin-overview.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".admin-badge"
+            ],
+            "html": "<span class=\"admin-badge\">ADMIN · OWNER</span>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR PLATFORM, AT A GLANCE</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".session-strip > span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 13,
+    "name": "desktop-admin-access",
+    "screenshot": "docs/accessibility/before/13-desktop-admin-access.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".admin-badge"
+            ],
+            "html": "<span class=\"admin-badge\">ADMIN · OWNER</span>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR PLATFORM, AT A GLANCE</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 7.5pt (10px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 14,
+    "name": "desktop-walkthrough",
+    "screenshot": "docs/accessibility/before/14-desktop-walkthrough.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "button:nth-child(1)"
+            ],
+            "html": "<button type=\"button\">0:00 · Admin &amp; finance access</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "button:nth-child(2)"
+            ],
+            "html": "<button type=\"button\">0:23 · Business posts freight</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "button:nth-child(3)"
+            ],
+            "html": "<button type=\"button\">0:48 · Carrier on mobile</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "button:nth-child(4)"
+            ],
+            "html": "<button type=\"button\">1:12 · Business confirms &amp; billing</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "button:nth-child(5)"
+            ],
+            "html": "<button type=\"button\">1:37 · Carrier jobs &amp; banking</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  },
+  {
+    "step": 15,
+    "name": "mobile-signin",
+    "screenshot": "docs/accessibility/before/15-mobile-signin.png",
+    "violations": [
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "description": "Page should contain a level-one heading",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "html"
+            ],
+            "html": "<html lang=\"en\">",
+            "summary": "Fix all of the following:\n  Page must have a level-one heading"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 16,
+    "name": "mobile-account-setup",
+    "screenshot": "docs/accessibility/before/16-mobile-account-setup.png",
+    "violations": [
+      {
+        "id": "page-has-heading-one",
+        "impact": "moderate",
+        "description": "Page should contain a level-one heading",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "html"
+            ],
+            "html": "<html lang=\"en\">",
+            "summary": "Fix all of the following:\n  Page must have a level-one heading"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 17,
+    "name": "mobile-shipments",
+    "screenshot": "docs/accessibility/before/17-mobile-shipments.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "div > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR SHIPPING WORKSPACE</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".selected > .route-cell > small"
+            ],
+            "html": "<small>SHP-1042</small>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #67717b, background color: #e7f3f0, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".footnote"
+            ],
+            "html": "<p class=\"footnote\">",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.87 (foreground color: #71817e, background color: #faf9f6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".session-strip > span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 7
+      }
+    ]
+  },
+  {
+    "step": 18,
+    "name": "mobile-shipment-dialog",
+    "screenshot": "docs/accessibility/before/18-mobile-shipment-dialog.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "div > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR SHIPPING WORKSPACE</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".selected > .route-cell > small"
+            ],
+            "html": "<small>SHP-1042</small>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.37 (foreground color: #67717b, background color: #e7f3f0, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".footnote"
+            ],
+            "html": "<p class=\"footnote\">",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.87 (foreground color: #71817e, background color: #faf9f6, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "form > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">LET’S GET IT MOVING</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".session-strip > span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 7
+      }
+    ]
+  },
+  {
+    "step": 19,
+    "name": "mobile-market-form",
+    "screenshot": "docs/accessibility/before/19-mobile-market-form.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR PEOPLE. YOUR NEXT OPPORTUNITY.</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "description": "Document should have one main landmark",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "html"
+            ],
+            "html": "<html lang=\"en\">",
+            "summary": "Fix all of the following:\n  Document does not have a main landmark"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Member bookings · Dispatch and payments not connected</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 20,
+    "name": "mobile-tracking",
+    "screenshot": "docs/accessibility/before/20-mobile-tracking.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "div > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">TRANSPORTATION MANAGEMENT</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".national-intro > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">PARTNER TEST DRIVE · PACKAGES + FREIGHT</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.31 (foreground color: #647779, background color: #edf7f5, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 21,
+    "name": "mobile-billing",
+    "screenshot": "docs/accessibility/before/21-mobile-billing.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">SIMPLE, TRANSPARENT COSTS</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".session-strip > span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 22,
+    "name": "mobile-carrier-board",
+    "screenshot": "docs/accessibility/before/22-mobile-carrier-board.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR PEOPLE. YOUR NEXT OPPORTUNITY.</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "landmark-one-main",
+        "impact": "moderate",
+        "description": "Document should have one main landmark",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "html"
+            ],
+            "html": "<html lang=\"en\">",
+            "summary": "Fix all of the following:\n  Document does not have a main landmark"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Member bookings · Dispatch and payments not connected</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 23,
+    "name": "mobile-practice-loads",
+    "screenshot": "docs/accessibility/before/23-mobile-practice-loads.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "section > .eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">PRACTICE LOADS · SAMPLE DATA</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "heading-order",
+        "impact": "moderate",
+        "description": "Heading levels should only increase by one",
+        "tags": [
+          "cat.semantics",
+          "best-practice"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "h3"
+            ],
+            "html": "<h3>5 available loads</h3>",
+            "summary": "Fix any of the following:\n  Heading order invalid"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 24,
+    "name": "mobile-jobs",
+    "screenshot": "docs/accessibility/before/24-mobile-jobs.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">SHARED LOAD BOARD</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Member bookings · Dispatch and payments not connected</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 25,
+    "name": "mobile-earnings",
+    "screenshot": "docs/accessibility/before/25-mobile-earnings.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">EVERY MILE COUNTS</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          },
+          {
+            "target": [
+              ".demo-bar > span"
+            ],
+            "html": "<span>Private pilot · Sample rates and dates · Workspace access restricted</span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": []
+  },
+  {
+    "step": 26,
+    "name": "mobile-admin-overview",
+    "screenshot": "docs/accessibility/before/26-mobile-admin-overview.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".admin-badge"
+            ],
+            "html": "<span class=\"admin-badge\">ADMIN · OWNER</span>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR PLATFORM, AT A GLANCE</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".session-strip > span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 3
+      }
+    ]
+  },
+  {
+    "step": 27,
+    "name": "mobile-admin-access",
+    "screenshot": "docs/accessibility/before/27-mobile-admin-access.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              ".admin-badge"
+            ],
+            "html": "<span class=\"admin-badge\">ADMIN · OWNER</span>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 8.3pt (11px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              ".eyebrow"
+            ],
+            "html": "<p class=\"eyebrow\">YOUR PLATFORM, AT A GLANCE</p>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.47 (foreground color: #647779, background color: #faf9f6, font size: 6.8pt (9px), font weight: bold). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      },
+      {
+        "id": "region",
+        "impact": "moderate",
+        "description": "All page content should be contained by landmarks",
+        "tags": [
+          "cat.keyboard",
+          "best-practice",
+          "RGAAv4",
+          "RGAA-9.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "span:nth-child(1)"
+            ],
+            "html": "<span>",
+            "summary": "Fix any of the following:\n  Some page content is not contained by landmarks"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 3
+      }
+    ]
+  },
+  {
+    "step": 28,
+    "name": "mobile-walkthrough",
+    "screenshot": "docs/accessibility/before/28-mobile-walkthrough.png",
+    "violations": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "description": "Elements must meet minimum color contrast ratio thresholds",
+        "tags": [
+          "cat.color",
+          "wcag2aa",
+          "wcag143",
+          "TTv5",
+          "TT13.c",
+          "EN-301-549",
+          "EN-9.1.4.3",
+          "ACT",
+          "RGAAv4",
+          "RGAA-3.2.1"
+        ],
+        "nodes": [
+          {
+            "target": [
+              "button:nth-child(1)"
+            ],
+            "html": "<button type=\"button\">0:00 · Admin &amp; finance access</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "button:nth-child(2)"
+            ],
+            "html": "<button type=\"button\">0:23 · Business posts freight</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "button:nth-child(3)"
+            ],
+            "html": "<button type=\"button\">0:48 · Carrier on mobile</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "button:nth-child(4)"
+            ],
+            "html": "<button type=\"button\">1:12 · Business confirms &amp; billing</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          },
+          {
+            "target": [
+              "button:nth-child(5)"
+            ],
+            "html": "<button type=\"button\">1:37 · Carrier jobs &amp; banking</button>",
+            "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.27 (foreground color: #087f78, background color: #e7f3f0, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+          }
+        ]
+      }
+    ],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "nodes": 1
+      },
+      {
+        "id": "video-caption",
+        "nodes": 1
+      }
+    ]
+  }
+]

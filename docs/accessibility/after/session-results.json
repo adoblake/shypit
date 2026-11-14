@@ -1,0 +1,22 @@
+[
+  {
+    "device": "desktop",
+    "state": "warning",
+    "violations": []
+  },
+  {
+    "device": "desktop",
+    "state": "locked",
+    "violations": []
+  },
+  {
+    "device": "mobile",
+    "state": "warning",
+    "violations": []
+  },
+  {
+    "device": "mobile",
+    "state": "locked",
+    "violations": []
+  }
+]

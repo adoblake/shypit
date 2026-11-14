@@ -62,6 +62,13 @@ export async function installAuthMock(page, options = {}) {
         },
       });
     }
+    if (path === "/rest/v1/rpc/shypit_extend_session")
+      return route.fulfill({
+        json: {
+          expires_at:
+            Math.floor((await page.evaluate(() => Date.now())) / 1000) + 240,
+        },
+      });
     if (path === "/rest/v1/rpc/shypit_market_list")
       return route.fulfill({ json: [] });
     if (path === "/rest/v1/rpc/shypit_admin_profile")
@@ -140,7 +147,9 @@ export async function installAuthMock(page, options = {}) {
         return route.fulfill({
           json: {
             access_token: "test-valid-access",
-            expires_at: state.expiresAt || Math.floor(Date.now() / 1000) + 900,
+            expires_at:
+              state.expiresAt ||
+              Math.floor((await page.evaluate(() => Date.now())) / 1000) + 900,
           },
         });
       }
@@ -191,7 +200,9 @@ export async function installAuthMock(page, options = {}) {
             json: {
               access_token: "test-valid-access",
               expires_at:
-                state.expiresAt || Math.floor(Date.now() / 1000) + 3600,
+                state.expiresAt ||
+                Math.floor((await page.evaluate(() => Date.now())) / 1000) +
+                  3600,
             },
           });
     if (request.headers().authorization !== "Bearer test-valid-access")

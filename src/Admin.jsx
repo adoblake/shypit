@@ -35,6 +35,7 @@ export default function Admin({ request, profile, onAccessChanged }) {
   }
   const permissions = profile.capabilities.join(",");
   useEffect(() => {
+    document.title = `${sections[section] || "Administration"} | Shypit Admin`;
     if (!profile.capabilities.includes(section)) {
       setData(null);
       setSection(profile.capabilities[0] || "");
@@ -63,7 +64,7 @@ export default function Admin({ request, profile, onAccessChanged }) {
     }
   }
   return (
-    <main className="admin-shell">
+    <main id="main-content" tabIndex={-1} className="admin-shell">
       <header className="admin-header">
         <a className="brand" href="#">
           <Brand />

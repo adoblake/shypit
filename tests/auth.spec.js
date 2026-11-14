@@ -96,7 +96,9 @@ test("inactive session locks automatically", async ({ page }) => {
   await signIn(page);
   await expect(page.getByRole("navigation")).toBeVisible();
   await page.clock.fastForward(16 * 60 * 1000);
-  await expect(page.getByLabel("Work email")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Sign in to resume your work." }),
+  ).toBeVisible();
   await expect(page.getByRole("navigation")).toHaveCount(0);
 });
 test("sign-in fits viewport without horizontal scroll", async ({

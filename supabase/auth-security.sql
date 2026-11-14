@@ -133,6 +133,28 @@ revoke all on function public.shypit_auth_begin(text,text),public.shypit_auth_fi
 grant execute on function public.shypit_auth_begin(text,text),public.shypit_auth_finish(uuid,boolean),public.shypit_invitation_lookup(text),public.shypit_activate_invitation(text,uuid),public.shypit_permit_session(uuid,uuid,text,timestamptz),public.shypit_record_email_help(text,text,text,text) to service_role;
 revoke all on function public.shypit_session_allowed() from public,anon;
 grant execute on function public.shypit_session_allowed() to authenticated;
+-- An explicit user action in the warning period extends an existing permit.
+-- It cannot create, resurrect, or renew another user's session, bypass a lock,
+-- or outlive the provider token. Each action adds two minutes; a one-hour
+-- provider token supports more than ten extensions of the initial 15 minutes.
+create or replace function public.shypit_extend_session() returns jsonb
+language plpgsql security definer set search_path='' as $$
+declare expiry timestamptz; token_expiry timestamptz;
+begin
+ if not public.shypit_session_allowed() then raise exception 'Session expired'; end if;
+ token_expiry := to_timestamp((auth.jwt()->>'exp')::double precision);
+ if token_expiry is null or token_expiry <= now()+interval '2 minutes' then raise exception 'Sign in again'; end if;
+ update shypit_private.session_permits p
+ set expires_at=least(p.expires_at+interval '2 minutes',token_expiry)
+ where p.user_id=auth.uid() and p.session_id::text=auth.jwt()->>'session_id'
+ and p.expires_at>now() and p.expires_at<=now()+interval '2 minutes'
+ and exists(select 1 from public.memberships m where m.user_id=auth.uid() and m.active)
+ returning p.expires_at into expiry;
+ if expiry is null then raise exception 'Extension unavailable'; end if;
+ return jsonb_build_object('expires_at',extract(epoch from expiry));
+end;$$;
+revoke all on function public.shypit_extend_session() from public,anon;
+grant execute on function public.shypit_extend_session() to authenticated;
 alter policy own_active_membership on public.memberships using(user_id=(select auth.uid()) and active and (select public.shypit_session_allowed()));
 alter policy member_reads_workspace on public.workspaces using((select public.shypit_session_allowed()) and exists(select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.active and m.workspace_id=workspaces.id));
 alter policy member_updates_workspace on public.workspaces using((select public.shypit_session_allowed()) and exists(select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.active and m.workspace_id=workspaces.id)) with check((select public.shypit_session_allowed()) and exists(select 1 from public.memberships m where m.user_id=(select auth.uid()) and m.active and m.workspace_id=workspaces.id));
