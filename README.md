@@ -12,13 +12,13 @@ Responsive private freight workspace for businesses and carriers. React + Vite; 
 
 [Set up private access for you and Ronald](docs/preview-access.md). Both founders can be explicitly assigned company and LLC-carrier workspaces; the app lists only server-approved memberships. Passwords are created privately in Shypit after verifying a secure email link. [Activate password setup, recovery and server lockouts](docs/account-recovery.md).
 
-[Watch the admin and team workflow walkthrough](https://adoblake.github.io/shypit/walkthrough/). The 103-second silent, captioned recording includes admin permissions, company booking, mobile LLC-carrier work, and delivery review, with chapter navigation and a portrait carrier clip. It uses fictional accounts and freight; dispatch handoff and payouts are simulated.
+[Watch the admin and team workflow walkthrough](https://adoblake.github.io/shypit/walkthrough/). The silent, captioned recording follows admin permissions and finance access, business load-board posting, mobile LLC-carrier quotes, business confirmation, shared jobs, and test-mode banking. Includes chapter navigation and a portrait carrier flow. Accounts and API responses are fictional; no real bank verification, freight dispatch, delivery, or payout occurs.
 
 ## Member load board
 
 Businesses use **Load board** to post freight or prepare a post from an existing shipment. Carriers use **Find loads** to search shared member listings and submit private quotes or fixed-rate requests. A business confirms one carrier; the booking appears in **My jobs**, with exact addresses and contacts released only to the confirmed parties. Posting, requests, booking and cancellation are persisted across workspaces. **Practice with sample loads** retains the earlier simulated journey separately.
 
-[Marketplace setup and security](docs/marketplace.md). New listings are not seeded in production. Real dispatch, shared delivery progression, verification of carrier authority, and payments remain separate work. The existing walkthrough is a scripted preview rather than a recording of this new marketplace.
+[Marketplace setup and security](docs/marketplace.md). New listings are not seeded in production. Real dispatch, shared delivery progression, verification of carrier authority, and payments remain separate work. The walkthrough demonstrates this flow using a shared sample API store; it does not use real accounts or move freight.
 
 ## Run
 

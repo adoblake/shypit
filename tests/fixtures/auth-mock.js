@@ -77,7 +77,33 @@ export async function installAuthMock(page, options = {}) {
       if (!state.adminProfile?.owner)
         return route.fulfill({ status: 403, json: { error: "denied" } });
       state.adminChanges ??= [];
-      state.adminChanges.push(request.postDataJSON());
+      const change = request.postDataJSON();
+      state.adminChanges.push(change);
+      const user = state.adminData?.access?.users?.find(
+        (u) => u.id === change.p_target,
+      );
+      const membership = state.adminData?.access?.memberships?.find(
+        (m) =>
+          m.user_id === change.p_target &&
+          m.workspace_id === change.p_options.workspace_id,
+      );
+      if (change.p_action === "admin-access" && user) {
+        user.active = change.p_options.active;
+        user.capabilities = change.p_options.capabilities;
+      }
+      if (change.p_action === "finance-access" && membership)
+        membership.finance_manager = change.p_options.active;
+      if (change.p_action === "membership-access" && membership)
+        membership.active = change.p_options.active;
+      if (state.adminData?.audit)
+        state.adminData.audit.unshift({
+          id: state.adminChanges.length,
+          actor: state.userId || "11111111-1111-4111-8111-111111111111",
+          target: change.p_target,
+          action: change.p_action,
+          created_at: new Date().toISOString(),
+          details: { after: change.p_options },
+        });
       return route.fulfill({ status: 204 });
     }
     if (path === "/functions/v1/shypit-auth/health")
@@ -174,8 +200,8 @@ export async function installAuthMock(page, options = {}) {
     if (path === "/auth/v1/user")
       return route.fulfill({
         json: {
-          id: "11111111-1111-4111-8111-111111111111",
-          email: state.role + "@example.test",
+          id: state.userId || "11111111-1111-4111-8111-111111111111",
+          email: state.userEmail || state.role + "@example.test",
         },
       });
     if (path === "/rest/v1/memberships") {

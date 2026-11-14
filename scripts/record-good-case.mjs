@@ -1,102 +1,92 @@
-// Records actual browser interactions using intercepted SAMPLE auth/data responses.
-// No real sign-in, dispatch, customer data or payments are used.
+// Actual UI recording with fictional accounts and intercepted auth/database/provider status.
+// No live sign-in, external bank verification, freight dispatch or payment occurs.
 import { chromium, expect } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 import {
   installAuthMock,
   passwordSignIn,
 } from "../tests/fixtures/auth-mock.js";
-import { initialShipments, loads } from "../tests/fixtures/demo-data.js";
-const out = "docs/walkthrough";
+import { installMarketMock } from "../tests/fixtures/market-mock.js";
+const out = "docs/walkthrough",
+  store = [];
 await mkdir(out + "/raw", { recursive: true });
+const business = "a1111111-1111-4111-8111-111111111111",
+  driver = "b2222222-2222-4222-8222-222222222222";
+const owner = "11111111-1111-4111-8111-111111111111",
+  shipper = "22222222-2222-4222-8222-222222222222",
+  operator = "33333333-3333-4333-8333-333333333333";
+const password = "Sample-only-not-a-real-password!";
 const browser = await chromium.launch({
   executablePath: "/usr/bin/chromium",
   args: ["--no-sandbox"],
-  slowMo: 100,
+  slowMo: 90,
 });
-const members = [
-  {
-    workspace_id: "22222222-2222-4222-8222-222222222222",
-    role: "business",
-    display_name: "Cedar Supply Co. · sample business",
-  },
-  {
-    workspace_id: "33333333-3333-4333-8333-333333333333",
-    role: "driver",
-    display_name: "Open Road Logistics LLC · sample carrier",
-  },
-];
-const sampleLoad = {
-  ...loads[0],
-  id: "LOAD-PREVIEW-1001",
-  pickup: "2026-11-14",
-  delivery: "2026-11-15",
-  cargo:
-    "8 pallets of office organizers · Cedar Supply Co. → Harbor Office Goods (B2B)",
-};
-const starting = {
-  shipments: structuredClone(initialShipments),
-  loads: [sampleLoad],
-  jobs: [],
-  packages: [],
-};
-let companyData = structuredClone(starting),
-  driverData = structuredClone(starting);
-async function setup(name, viewport, at) {
+async function setup(name, role, mobile = false, admin = false) {
+  const viewport = mobile
+    ? { width: 390, height: 844 }
+    : { width: 1280, height: 900 };
   const context = await browser.newContext({
-    viewport,
-    recordVideo: { dir: out + "/raw", size: viewport },
-  });
-  const page = await context.newPage();
-  if (at) await page.clock.install({ time: new Date(at) });
+      viewport,
+      timezoneId: "America/Phoenix",
+      recordVideo: { dir: out + "/raw", size: viewport },
+    }),
+    page = await context.newPage();
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.addInitScript(() => {
     document.addEventListener("DOMContentLoaded", () => {
-      const label = document.createElement("div");
-      label.textContent = "SCRIPTED PREVIEW · SAMPLE ACCOUNTS & DATA";
-      Object.assign(label.style, {
-        position: "fixed",
-        left: "0",
-        top: "0",
-        right: "0",
-        zIndex: "1000",
-        background: "#101d32",
-        color: "#b4e5dc",
-        font: '11px "DM Sans", sans-serif',
-        padding: "7px 12px",
-        textAlign: "center",
-        pointerEvents: "none",
-      });
-      document.body.append(label);
-      document.body.style.paddingTop = "30px";
-      const caption = document.createElement("div");
-      caption.id = "recording-caption";
-      Object.assign(caption.style, {
-        position: "fixed",
-        left: "0",
-        bottom: "0",
-        right: "0",
-        zIndex: "1000",
-        background: "#101d32",
-        color: "#fff",
-        font: '15px "DM Sans", sans-serif',
-        padding: "16px",
-        lineHeight: "1.5",
-        textAlign: "center",
-        pointerEvents: "none",
-      });
-      document.body.append(caption);
+      document.body.style.paddingTop = "28px";
+      for (const [id, position, text] of [
+        ["recording-label", "top", "SCRIPTED DEMO · FICTIONAL ACCOUNTS & DATA"],
+        ["recording-caption", "bottom", ""],
+      ]) {
+        const div = document.createElement("div");
+        div.id = id;
+        div.textContent = text;
+        Object.assign(div.style, {
+          position: "fixed",
+          [position]: "0",
+          left: "0",
+          right: "0",
+          zIndex: "9999",
+          background: "#101d32",
+          color: id === "recording-label" ? "#b4e5dc" : "white",
+          font: `${id === "recording-label" ? "10" : "15"}px "DM Sans", sans-serif`,
+          padding: id === "recording-label" ? "7px 10px" : "15px 18px",
+          lineHeight: "1.5",
+          textAlign: "center",
+          pointerEvents: "none",
+        });
+        document.body.append(div);
+      }
     });
   });
+  const workspace = role === "business" ? business : driver;
   const auth = await installAuthMock(page, {
-    expiresAt: at
-      ? Math.floor(new Date(at).getTime() / 1000) + 3600
-      : undefined,
+    role,
+    userId: admin ? owner : role === "business" ? shipper : operator,
+    userEmail: admin
+      ? "owner.demo@example.test"
+      : role === "business"
+        ? "shipper.demo@example.test"
+        : "carrier.demo@example.test",
     emailOtpEnabled: false,
     googleEnabled: false,
-    memberships: members,
-    ...(name === "00-admin"
+    memberships: [
+      {
+        workspace_id: workspace,
+        role,
+        display_name:
+          role === "business" ? "Cedar Supply Co." : "Open Road Logistics LLC",
+      },
+    ],
+    banking: {
+      configured: true,
+      canManage: true,
+      mode: "test",
+      state: "not_connected",
+    },
+    ...(admin
       ? {
           adminProfile: {
             owner: true,
@@ -106,59 +96,56 @@ async function setup(name, viewport, at) {
             stats: {
               workspaces: 2,
               active_memberships: 4,
-              shipments: companyData.shipments.length,
+              shipments: 3,
               jobs: 0,
               packages: 0,
             },
-            operations: [
-              {
-                id: members[0].workspace_id,
-                kind: "business",
-                revision: 0,
-                data: companyData,
-              },
-            ],
             access: {
               users: [
                 {
-                  id: "owner",
-                  email: "owner.preview@example.test",
+                  id: owner,
+                  email: "owner.demo@example.test",
                   owner: true,
                   active: true,
                   capabilities: [],
                 },
                 {
-                  id: "reviewer",
-                  email: "reviewer.preview@example.test",
+                  id: shipper,
+                  email: "shipper.demo@example.test",
                   owner: false,
                   active: false,
                   capabilities: [],
                 },
               ],
-              memberships: [],
+              memberships: [
+                {
+                  user_id: shipper,
+                  workspace_id: business,
+                  role: "business",
+                  display_name: "Cedar Supply Co.",
+                  active: true,
+                  finance_manager: false,
+                },
+              ],
             },
+            operations: [],
             audit: [],
             testing: {},
           },
         }
       : {}),
-    workspaceData: {
-      [members[0].workspace_id]: companyData,
-      [members[1].workspace_id]: driverData,
-    },
   });
+  await installMarketMock(page, store, workspace, role);
   await page.goto("http://127.0.0.1:4173");
   await page.evaluate(() => document.fonts.ready);
-  return { context, page, auth, errors, name };
+  return { name, page, context, auth, errors };
 }
-async function scene(page, text, ms = 1800) {
-  await page.evaluate(
-    (text) => (document.getElementById("recording-caption").textContent = text),
-    text,
-  );
-  // Allow enough reading time for a silent walkthrough, including on mobile.
+async function scene(page, text, min = 2200) {
+  await page.evaluate((text) => {
+    document.getElementById("recording-caption").textContent = text;
+  }, text);
   await page.waitForTimeout(
-    Math.max(ms, 2000, text.trim().split(/\s+/).length * 250),
+    Math.max(min, text.trim().split(/\s+/).length * 270),
   );
 }
 async function finish(s) {
@@ -168,265 +155,276 @@ async function finish(s) {
   await s.page.video().saveAs(out + "/raw/" + s.name + ".webm");
   console.log("Recorded " + s.name);
 }
+async function login(s, admin = false) {
+  if (admin) {
+    await s.page
+      .getByRole("button", { name: "Admin Login", exact: true })
+      .click();
+    await s.page
+      .getByLabel("Email address", { exact: true })
+      .fill("owner.demo@example.test");
+    await s.page.getByLabel("Password", { exact: true }).fill(password);
+    await s.page.getByRole("button", { name: "Sign in as admin" }).click();
+  } else await passwordSignIn(s.page, s.auth.userEmail, password);
+}
 try {
-  const admin = await setup("00-admin", { width: 1280, height: 900 }),
-    a = admin.page;
+  // 1. Owner: real public admin entry, scoped permissions, and finance access.
+  const a = await setup("00-admin", "business", false, true),
+    p = a.page;
   await scene(
-    a,
-    "1 · Admin: an approved owner uses the same private sign-in as the team.",
-    2200,
+    p,
+    "1 · Admin: an approved owner starts with Admin Login beneath the sign-in button.",
   );
-  await passwordSignIn(
-    a,
-    "owner.preview@example.test",
-    "Sample-only-not-a-real-password!",
-  );
-  await a.getByRole("button", { name: "Company workspace" }).click();
+  await login(a, true);
+  await expect(
+    p.getByRole("heading", { name: "Keep good work moving." }),
+  ).toBeVisible();
   await scene(
-    a,
-    "The home page has a compact Admin Login link. Only approved admins see it.",
-    2400,
+    p,
+    "The owner sees pilot statistics. These sample record counts are not revenue or verified deliveries.",
   );
-  await a.getByRole("button", { name: "Admin Login" }).click();
-  await expect(a.getByText("Workspaces", { exact: true })).toBeVisible();
-  await scene(
-    a,
-    "The owner reviews saved pilot counts. Sample records are not revenue or verified deliveries.",
-    2600,
-  );
-  await a
+  await p
     .getByRole("button", { name: "People & permissions", exact: true })
     .click();
-  await a.getByLabel("Admin access enabled").check();
-  await a.getByLabel("Overview", { exact: true }).check();
+  await p.getByLabel("Admin access enabled").check();
+  await p.getByLabel("Overview", { exact: true }).check();
   await scene(
-    a,
-    "Give a reviewer only Overview access. Founder accounts stay protected; only owners can change access.",
-    2800,
+    p,
+    "Assign only the access a teammate needs. This shipper receives Overview-only admin access.",
   );
-  await a.getByRole("button", { name: "Review admin changes" }).click();
+  await p.getByRole("button", { name: "Review admin changes" }).click();
   await scene(
-    a,
-    "Review the proposed permissions before confirming the change.",
-    2200,
-  );
-  await a.getByRole("button", { name: "Confirm admin changes" }).click();
-  await expect(a.getByText("Access updated.", { exact: false })).toBeVisible();
-  expect(admin.auth.adminChanges[0].p_options).toEqual({
-    active: true,
-    capabilities: ["stats"],
-  });
-  admin.auth.adminData.audit = [
-    {
-      id: 1,
-      actor: "Sample owner",
-      action: "admin-access",
-      target: "Sample reviewer",
-      created_at: "2026-11-13T19:00:00Z",
-      details: { after: { active: true, capabilities: ["stats"] } },
-    },
-  ];
-  await a.getByRole("button", { name: "Audit history", exact: true }).click();
-  await scene(
-    a,
-    "Access changes appear in audit history. This example uses a fictional reviewer.",
+    p,
+    "Review permissions before confirming. Founder accounts remain protected.",
     2400,
   );
-  await a.getByRole("button", { name: "Operations", exact: true }).click();
-  await a.getByText("Company workspace · revision 0", { exact: false }).click();
+  await p.getByRole("button", { name: "Confirm admin changes" }).click();
+  await expect(p.getByText("Limited admin", { exact: true })).toBeVisible();
+  await p
+    .getByRole("button", { name: "Grant finance access" })
+    .scrollIntoViewIfNeeded();
   await scene(
-    a,
-    "Operations gives admins a read-only view of the saved freight records.",
-    2400,
+    p,
+    "Finance access is separate: an owner assigns it for the specific company workspace.",
   );
-  await a.getByRole("button", { name: "Build & test", exact: true }).click();
-  await scene(
-    a,
-    "Build & test links to GitHub checks and the walkthrough. Infrastructure access remains separate.",
-    2600,
-  );
-  await finish(admin);
+  p.once("dialog", (d) => d.accept());
+  await p.getByRole("button", { name: "Grant finance access" }).click();
+  await expect(
+    p.getByRole("button", { name: "Remove finance access" }),
+  ).toBeVisible();
+  await p.getByRole("button", { name: "Audit history", exact: true }).click();
+  await scene(p, "Both access changes are recorded in the audit history.");
+  await finish(a);
   if (process.env.SHYPIT_RECORD_ONLY !== "admin") {
-    const s = await setup("01-company", { width: 1280, height: 900 }),
-      p = s.page;
+    // 2. Small B2B business posts a real UI listing to the shared sample store.
+    const c = await setup("01-company", "business"),
+      q = c.page;
     await scene(
-      p,
-      "2 · Cedar Supply Co. is a small business selling office organizers to another business.",
+      q,
+      "2 · Business: Cedar Supply Co. needs eight pallets of office supplies delivered to Harbor Office Goods.",
     );
-    await passwordSignIn(
-      p,
-      "company.preview@example.test",
-      "Sample-only-not-a-real-password!",
+    await login(c);
+    await q.getByRole("button", { name: "Load board", exact: true }).click();
+    await q
+      .getByRole("button", { name: "Post a shipment", exact: true })
+      .click();
+    const pickup = new Date(Date.now() + 3 * 86400000)
+        .toISOString()
+        .slice(0, 10),
+      delivery = new Date(Date.now() + 4 * 86400000).toISOString().slice(0, 10);
+    for (const [label, value] of [
+      ["Business name", "Cedar Supply Co."],
+      ["Pickup city and state", "Phoenix, AZ"],
+      ["Delivery city and state", "Los Angeles, CA"],
+      ["Pickup date", pickup],
+      ["Delivery date", delivery],
+      ["Pallets", "8"],
+      ["Weight (lb)", "6400"],
+    ])
+      await q.getByLabel(label, { exact: true }).fill(value);
+    await q
+      .getByRole("combobox", { name: "Cargo category", exact: true })
+      .selectOption("Office supplies");
+    await q
+      .getByLabel("Business name", { exact: true })
+      .scrollIntoViewIfNeeded();
+    await scene(
+      q,
+      "Members see the business, city-to-city route, dates, equipment and cargo. The business requests private quotes.",
     );
+    for (const [label, value] of [
+      [
+        "Pickup street address",
+        "Cedar Supply Co. · 123 Sample Dock, Phoenix, AZ",
+      ],
+      [
+        "Delivery street address",
+        "Harbor Office Goods · 456 Sample Receiving, Los Angeles, CA",
+      ],
+      ["Shipping contact name", "Sample Shipping Team"],
+      ["Shipping contact email", "shipping.demo@example.test"],
+      ["Shipping contact phone", "555-010-1000"],
+    ])
+      await q.getByLabel(label, { exact: true }).fill(value);
+    await scene(
+      q,
+      "Exact addresses and contact details stay private until a carrier booking is confirmed.",
+    );
+    await q
+      .getByRole("button", { name: "Review listing", exact: true })
+      .click();
+    await scene(
+      q,
+      "The business reviews the post before publishing it to approved carrier members.",
+    );
+    await q
+      .getByRole("button", { name: "Publish to member load board" })
+      .click();
     await expect(
-      p.getByRole("heading", { name: "Choose your workspace." }),
+      q.getByText("Shipment posted to approved carrier members."),
+    ).toBeVisible();
+    expect(store).toHaveLength(1);
+    await scene(
+      q,
+      "The shared post is saved. Carrier members can now find it; no dispatch or charge has been triggered.",
+    );
+    await finish(c);
+    // 3. Carrier finds the post, submits a private reviewed quote on mobile.
+    const r = await setup("02-carrier-mobile", "driver", true),
+      m = r.page;
+    await scene(
+      m,
+      "3 · Carrier: the compact mobile sign-in gets the independent LLC operator straight to work.",
+    );
+    await login(r);
+    await m.getByLabel("Search member loads").fill("Phoenix");
+    await m
+      .getByRole("combobox", { name: "Load equipment", exact: true })
+      .selectOption("Dry van");
+    await scene(
+      m,
+      "Open Road Logistics LLC searches member-posted work by route and equipment.",
+    );
+    await m.locator(".market-listing").click();
+    await expect(
+      m.getByText("Pickup: Cedar Supply Co.", { exact: false }),
+    ).toHaveCount(0);
+    await scene(
+      m,
+      "The carrier reviews the freight. Dock addresses and shipper contacts are still hidden.",
+    );
+    await m
+      .getByRole("button", { name: "Submit a quote", exact: true })
+      .click();
+    for (const [label, value] of [
+      ["Carrier / LLC name", "Open Road Logistics LLC"],
+      ["Your quote (USD)", "920"],
+      ["Carrier contact name", "Sample LLC Operator"],
+      ["Carrier contact email", "operator.demo@example.test"],
+      ["Carrier contact phone", "555-010-2000"],
+    ])
+      await m.getByLabel(label, { exact: true }).fill(value);
+    await m
+      .getByRole("button", { name: "Review request", exact: true })
+      .click();
+    await scene(
+      m,
+      "Review the $920 quote. It is private to the business; contact details are shared only after confirmation.",
+    );
+    await m.getByRole("button", { name: "Send request to business" }).click();
+    await expect(
+      m.getByText("Request sent to the business.", { exact: false }),
     ).toBeVisible();
     await scene(
-      p,
-      "Private preview: approved accounts choose a company or carrier workspace.",
-    );
-    await p.getByRole("button", { name: /Company workspace/ }).click();
-    await expect(p.getByRole("navigation")).toBeVisible();
-    await scene(
-      p,
-      "Cedar Supply needs 8 pallets shipped from Phoenix to Harbor Office Goods in Los Angeles.",
-    );
-    await p.getByRole("button", { name: "New shipment", exact: true }).click();
-    await p.getByLabel("Pickup location").fill("Phoenix, AZ");
-    await p.getByLabel("Delivery location").fill("Los Angeles, CA");
-    await p.getByLabel("Pickup date").fill("2026-11-14");
-    await p.getByLabel("Delivery date").fill("2026-11-15");
-    await scene(
-      p,
-      "The business specifies the route, dates, equipment, pallet count and weight.",
-    );
-    await p.getByRole("button", { name: "Create shipment draft" }).click();
-    await expect(p.locator("aside")).toContainText("Phoenix");
-    await p.locator("aside").scrollIntoViewIfNeeded();
-    await scene(
-      p,
-      "Standard service: $965 illustrative total, including the service fee.",
-    );
-    await p.getByRole("button", { name: "Review & book" }).click();
-    await scene(
-      p,
-      "The company reviews the route and transparent price before confirming.",
-    );
-    await p.getByRole("button", { name: "Confirm demo booking" }).click();
-    await expect(p.getByText("Saved securely")).toBeVisible();
-    await scene(
-      p,
-      "Shipment booked in the sample workspace. A carrier match is the next step.",
-    );
-    companyData = s.auth.workspaceData[members[0].workspace_id];
-    await finish(s);
-    const c = await setup("02-carrier-mobile", { width: 390, height: 844 }),
-      m = c.page;
-    await scene(
       m,
-      "3 · The carrier is an independent operator with their own LLC.",
-      2200,
+      "My requests shows the pending offer. Sending a quote does not reserve the load or schedule a payout.",
     );
-    await passwordSignIn(
-      m,
-      "carrier.preview@example.test",
-      "Sample-only-not-a-real-password!",
-    );
-    await m.getByRole("button", { name: /Carrier \/ LLC workspace/ }).click();
-    await m.getByRole("button", { name: "Practice with sample loads" }).click();
-    await expect(m.getByRole("navigation")).toBeVisible();
+    await finish(r);
+    // 4. Business chooses a carrier and sees the selected contact after confirmation.
+    const b = await setup("03-company-confirm", "business"),
+      s = b.page;
+    await login(b);
+    await s.getByRole("button", { name: "Load board", exact: true }).click();
+    await s.locator(".market-listing").click();
+    await expect(
+      s.getByText("operator.demo@example.test", { exact: false }),
+    ).toHaveCount(0);
     await scene(
-      m,
-      "Open Road Logistics LLC finds the prepared sample load on mobile. Live dispatch is simulated.",
+      s,
+      "4 · Business: review the private $920 quote. Carrier credentials and shipment terms need separate confirmation.",
     );
-    await m.getByLabel("Route or city").fill("Phoenix");
-    await m.getByLabel("Equipment", { exact: true }).selectOption("Dry van");
-    await m.locator(".load-row").first().click();
-    await m.locator("aside").scrollIntoViewIfNeeded();
+    s.once("dialog", (d) => d.accept());
+    await s.getByRole("button", { name: "Confirm carrier booking" }).click();
+    await expect(
+      s.getByText("Carrier confirmed.", { exact: false }),
+    ).toBeVisible();
+    expect(store[0].state).toBe("booked");
     await scene(
-      m,
-      "Before accepting: $920 payout, 18 miles to pickup and 373 loaded miles.",
+      s,
+      "The business confirms one carrier. Addresses and contacts are released to the confirmed parties.",
     );
-    await m.getByRole("button", { name: "Review load" }).click();
+    await s.getByRole("button", { name: "Billing", exact: true }).click();
+    await s
+      .getByRole("heading", { name: "Business payment account" })
+      .scrollIntoViewIfNeeded();
+    await s
+      .getByRole("button", { name: "Add payment account", exact: true })
+      .evaluate((el) => el.scrollIntoView({ block: "center" }));
     await scene(
-      m,
-      "The LLC reviews the cargo, pickup window, route and sample payout.",
-    );
-    await m.getByRole("button", { name: "Accept demo load" }).click();
-    await expect(m.locator(".job")).toBeVisible();
-    await scene(
-      m,
-      "Accepted. The operator confirms pickup when safely parked.",
-    );
-    await m.getByRole("button", { name: "Confirm pickup" }).click();
-    await scene(
-      m,
-      "The goods are in transit. Delivery proof is required before completion.",
-    );
-    await m.locator("input[type=file]").setInputFiles({
-      name: "Harbor-Office-Goods-delivery-proof.pdf",
-      mimeType: "application/pdf",
-      buffer: Buffer.from(
-        "%PDF-1.4\nSample proof filename only; no document upload.",
-      ),
-    });
-    await m.getByRole("button", { name: "Confirm delivery" }).click();
-    await expect(m.locator(".job")).toContainText("Delivered");
-    await scene(
-      m,
-      "Delivery completed. The demo records a proof filename; secure file storage is not connected.",
-    );
-    await m.getByRole("button", { name: "Earnings", exact: true }).click();
-    await expect(m.locator(".earnings-summary")).toContainText("$920");
-    await scene(
-      m,
-      "The LLC sees $920 pending. This is an illustrative ledger, not an actual payment.",
-      2600,
-    );
-    driverData = c.auth.workspaceData[members[1].workspace_id];
-    await finish(c);
-    // Simulated cross-company dispatch handoff for this scripted recording only.
-    // The shipped app does not implement automatic cross-workspace dispatch synchronization.
-    companyData.shipments[0].status = driverData.jobs[0].status;
-    const f = await setup(
-        "03-company-delivery",
-        { width: 1280, height: 900 },
-        "2026-11-15T18:00:00Z",
-      ),
-      q = f.page;
-    await passwordSignIn(
-      q,
-      "company.preview@example.test",
-      "Sample-only-not-a-real-password!",
-    );
-    await q.getByRole("button", { name: /Company workspace/ }).click();
-    await expect(q.locator("aside")).toContainText("Delivered");
-    await scene(
-      q,
-      "4 · Company delivery view: the successful handoff is simulated for this recording.",
-    );
-    await q
-      .getByRole("button", { name: "Package tracking", exact: true })
-      .click();
-    await q.getByLabel("Package / barcode number").fill("CEDAR-PO-2048");
-    await q
-      .getByLabel("Company", { exact: true })
-      .fill("Cedar Supply Co. → Harbor Office Goods");
-    await q.getByLabel("Order / PO reference").fill("PO-2048");
-    await q
-      .getByLabel("Linked shipment")
-      .selectOption(companyData.shipments[0].id);
-    await q
-      .getByLabel("Estimated delivery", { exact: true })
-      .fill("2026-11-15");
-    await q.getByLabel("Origin", { exact: true }).fill("Phoenix, AZ");
-    await q.getByLabel("Destination", { exact: true }).fill("Los Angeles, CA");
-    await q.getByRole("button", { name: "Add to queue", exact: true }).click();
-    await q.getByLabel("New status").selectOption("Delivered");
-    await q
-      .getByLabel("Current location")
-      .fill("Harbor Office Goods · Los Angeles, CA");
-    await q
-      .getByLabel("Update note")
-      .fill(
-        "8 pallets received by the business customer. Proof recorded by the LLC carrier.",
-      );
-    await q.getByRole("button", { name: "Save travel update" }).click();
-    await q.getByRole("button", { name: "Preview company update" }).click();
-    await scene(
-      q,
-      "The business can review a customer-facing delivery update and download the report.",
-      3000,
+      s,
+      "Finance-authorized business staff start bank setup in Billing. Stripe handles verification in a secure separate tab.",
     );
     await scene(
-      q,
-      "Good-case preview complete: B2B shipment → LLC carrier → delivery proof → customer update. Sample data only.",
-      3000,
+      s,
+      "This is test mode. No real banking verification, shipment charge or subscription is completed in this recording.",
+    );
+    await finish(b);
+    // 5. Confirmed shared job and secure payout entry point, shown in portrait.
+    const f = await setup("04-carrier-job-banking", "driver", true),
+      t = f.page;
+    await login(f);
+    await t.getByRole("button", { name: "My jobs", exact: true }).click();
+    await expect(
+      t.getByRole("heading", { name: "Booked through the load board" }),
+    ).toBeVisible();
+    await scene(
+      t,
+      "5 · Carrier: after business confirmation, the shared booking appears in My jobs.",
+    );
+    await t.locator(".market-listing").click();
+    await expect(
+      t.getByText("Pickup: Cedar Supply Co.", { exact: false }),
+    ).toBeVisible();
+    await t
+      .getByRole("heading", { name: "Private booking details", exact: true })
+      .scrollIntoViewIfNeeded();
+    await scene(
+      t,
+      "The selected carrier can now see the pickup, delivery and shipping contact details.",
+    );
+    await t.getByRole("button", { name: "Earnings", exact: true }).click();
+    await t
+      .getByRole("heading", { name: "Provider payout account" })
+      .scrollIntoViewIfNeeded();
+    await scene(
+      t,
+      "Payout setup starts inside Earnings. Bank numbers are entered on Stripe’s hosted page, never stored by Shypit.",
+    );
+    await t
+      .getByRole("button", { name: "Connect payout account", exact: true })
+      .evaluate((el) => el.scrollIntoView({ block: "center" }));
+    await scene(
+      t,
+      "The secure Stripe tab keeps Shypit open. Returning checks status; an expired session can resume banking after sign-in.",
+    );
+    await scene(
+      t,
+      "Pilot walkthrough complete: post → private quote → confirmation → shared job. Live dispatch, delivery tracking and payments remain separate.",
     );
     await finish(f);
     await writeFile(
       out + "/scenario.md",
-      `# Admin and shipment workflow walkthrough\n\nAn approved sample owner enters Admin Login from the home page, reviews pilot counts, grants an Overview-only reviewer role, inspects audit history and operations, and opens Build & test.\n\nSilent, captioned browser recording. All companies, accounts, credentials, cargo and payouts are fictional sample data.\n\nCedar Supply Co. sells 8 pallets of office organizers to Harbor Office Goods. Open Road Logistics LLC accepts the Phoenix–Los Angeles shipment, confirms pickup, records a delivery-proof filename, and completes delivery. The company then reviews its delivery status and customer update.\n\nThe browser interactions use intercepted authentication/database responses. The cross-workspace dispatch handoff is simulated in the recording harness, not implemented as a live dispatch integration. No real account was used, freight moved, file uploaded, or money paid. Founder account activation is separate.\n\nRecordings: 00-admin.webm, 01-company.webm, 02-carrier-mobile.webm, 03-company-delivery.webm.\n\nThe player includes measured chapter seek buttons. Captions are embedded in the picture; the recording has no audio. A full text scenario is also available on the player page. Recording holds allow at least 250 ms per caption word.\n\nTo reproduce: run Vite on 127.0.0.1:4173, provide the Playwright recording FFmpeg dependency, then run npm run record:walkthrough and npm run encode:walkthrough. The encoder requires system ffmpeg and ffprobe. SHYPIT_RECORD_ONLY=admin refreshes only the admin source clip; re-encode afterward to update chapter offsets.\n`,
+      `# All sides: admin, shipper and carrier\n\nSilent, captioned browser recording with fictional accounts and intercepted API responses. No real identity, bank account, shipment, verification or payment is used.\n\n1. An owner enters the public Admin Login, reviews sample pilot counts, assigns Overview-only admin access and separate workspace finance access, and reviews audit history.\n2. Cedar Supply Co. posts eight pallets of office supplies from Phoenix to Harbor Office Goods in Los Angeles, requesting private quotes. Street addresses and contacts are withheld from the member listing.\n3. Open Road Logistics LLC signs in on mobile, searches route/equipment, reviews the listing and submits a private $920 quote.\n4. The business confirms that carrier. The shared booking and conditional contact visibility use the same recorded sample store across account views. The finance-authorized shipper reviews Billing's test-mode bank setup.\n5. The carrier sees the confirmed job and released booking details in My jobs, then reviews test-mode payout setup in Earnings.\n\nThis recording demonstrates current application screens and booking flows. The backend's access, transaction and privacy rules are separately tested against PostgreSQL. Provider-hosted bank verification is not filmed or completed, and no successful delivery, GPS integration, settlement, or live dispatch is implied. The practice-load simulation is excluded from this workflow.\n\nRegenerate with a running Vite app on 127.0.0.1:4173, a Playwright-compatible recording FFmpeg binary, npm run record:walkthrough and npm run encode:walkthrough. Captions are held for at least 270 ms per word. SHYPIT_RECORD_ONLY=admin refreshes the admin clip only.\n`,
     );
   }
 } finally {

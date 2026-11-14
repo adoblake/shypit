@@ -1,21 +1,25 @@
 {
-  "duration": 102.92,
+  "duration": 127.56,
   "chapters": [
     {
-      "title": "Admin controls",
+      "title": "Admin & finance access",
       "start": 0
     },
     {
-      "title": "Company booking",
-      "start": 30.76
+      "title": "Business posts freight",
+      "start": 23.88
     },
     {
       "title": "Carrier on mobile",
-      "start": 55.84
+      "start": 48.6
     },
     {
-      "title": "Delivery review",
-      "start": 84.64
+      "title": "Business confirms & billing",
+      "start": 72.4
+    },
+    {
+      "title": "Carrier jobs & banking",
+      "start": 97.2
     }
   ]
 }

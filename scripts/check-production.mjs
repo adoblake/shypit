@@ -137,8 +137,8 @@ try {
     );
     assert.equal(
       chapterData.chapters.length,
-      4,
-      "Four admin/team workflow chapters",
+      5,
+      "Five admin, business and carrier chapters",
     );
     assert.ok(
       Math.abs(

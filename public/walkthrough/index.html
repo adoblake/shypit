@@ -136,73 +136,82 @@
     </header>
     <main>
       <p class="eyebrow">ADMIN & TEAM WORKFLOW WALKTHROUGH</p>
-      <h1>One platform.<br />A trusted team.<br />A shipment, together.</h1>
+      <h1>See Shypit from every side.</h1>
       <p>
-        A captioned walkthrough of admin controls, company booking, the
-        carrier’s mobile experience, and delivery review.
+        Admin controls, business posts, private quotes, shared bookings, and
+        banking setup—on desktop and mobile.
       </p>
       <video
         controls
         playsinline
         preload="metadata"
-        poster="workflow-poster.jpg"
+        poster="workflow-poster.jpg?v=all-sides-v3"
         aria-label="Captioned admin and sample shipment walkthrough"
       >
-        <source src="shypit-good-case.mp4?v=admin-team-v2" type="video/mp4" />
+        <source src="shypit-good-case.mp4?v=all-sides-v3" type="video/mp4" />
         Your browser cannot play this video.
-        <a href="shypit-good-case.mp4?v=admin-team-v2">Download the MP4</a>.
+        <a href="shypit-good-case.mp4?v=all-sides-v3">Download the MP4</a>.
       </video>
       <nav id="chapters" aria-label="Video chapters"></nav>
       <p>
-        <a href="shypit-good-case.mp4?v=admin-team-v2" download
+        <a href="shypit-good-case.mp4?v=all-sides-v3" download
           >Download the walkthrough</a
         >
       </p>
       <p>
-        <a href="shypit-carrier-mobile.mp4" target="_blank" rel="noreferrer"
-          >Watch the carrier chapter in portrait</a
+        <a
+          href="shypit-carrier-mobile.mp4?v=all-sides-v3"
+          target="_blank"
+          rel="noreferrer"
+          >Watch the full carrier flow in portrait</a
         >
         — a larger view for phone screens.
       </p>
       <p class="note">
-        Scripted preview with fictional accounts and sample freight.
-        Cross-company dispatch is simulated; no real shipment, proof upload, or
-        payment takes place. This video shows the intended good-case journey,
-        not a connected live dispatch service.
+        Scripted demo with fictional accounts and sample data. It shows the
+        current load-board booking flow. Stripe-hosted verification, live
+        dispatch, delivery tracking, and payments are not performed in this
+        recording.
       </p>
       <details>
         <summary>Read the walkthrough</summary>
         <ol>
           <li>
-            An approved owner enters Admin Login from the home page, reviews
-            pilot counts, grants a fictional reviewer Overview-only access, and
-            reviews audit history, operations, and build tools. Founder accounts
-            are protected; only owners can change access.
+            <strong>Admin:</strong> Enter through Admin Login, review pilot
+            counts, assign Overview-only access and separate company finance
+            access, and inspect the audit history. Founder accounts remain
+            protected.
           </li>
           <li>
-            Cedar Supply Co. sells eight pallets of office organizers to Harbor
-            Office Goods. The company enters its shipment details, reviews the
-            illustrative $965 price, and confirms a demo booking.
+            <strong>Business posting:</strong> Cedar Supply Co. posts eight
+            pallets of office supplies from Phoenix to Harbor Office Goods in
+            Los Angeles. The member listing shows the city route and cargo;
+            exact addresses and contacts remain private.
           </li>
           <li>
-            An independent operator with Open Road Logistics LLC opens the
-            mobile carrier workspace, reviews the Phoenix–Los Angeles load, and
-            accepts the sample $920 payout.
+            <strong>Carrier on mobile:</strong> Open Road Logistics LLC uses the
+            compact sign-in, filters member loads, reviews the freight, and
+            submits a private $920 quote. The business must confirm it before it
+            becomes a booking.
           </li>
           <li>
-            The operator confirms pickup, records a delivery-proof filename,
-            completes delivery, and reviews pending sample earnings.
+            <strong>Business confirmation and banking:</strong> The shipper
+            reviews and confirms the carrier. The selected parties gain access
+            to booking contacts. Finance-authorized staff start test-mode
+            payment-account setup in Billing; Stripe handles verification
+            separately.
           </li>
           <li>
-            The video simulates the dispatch handoff. The company sees the
-            completed shipment and prepares a customer-facing tracking update
-            for its business customer.
+            <strong>Carrier jobs and banking:</strong> The carrier sees the
+            confirmed job and private shipment details in My jobs, then reviews
+            the test-mode payout setup in Earnings. No delivery, dispatch, or
+            payout is completed.
           </li>
         </ol>
       </details>
     </main>
     <script>
-      fetch("chapters.json")
+      fetch("chapters.json?v=all-sides-v3", { cache: "no-store" })
         .then((response) => {
           if (!response.ok) throw Error();
           return response.json();
