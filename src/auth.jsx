@@ -769,16 +769,32 @@ export function AuthGate({ children }) {
             <>
               <p className="eyebrow">WELCOME TO SHYPIT</p>
               <h2>
-                {pendingUser
-                  ? "Choose your workspace."
-                  : loginKind === "admin"
-                    ? "Admin sign-in."
-                    : "Sign in to your workspace."}
+                {pendingUser ? (
+                  "Choose your workspace."
+                ) : loginKind === "admin" ? (
+                  "Admin sign-in."
+                ) : (
+                  <>
+                    <span className="auth-desktop-copy">
+                      Sign in to your workspace.
+                    </span>
+                    <span className="auth-mobile-copy">Sign in.</span>
+                  </>
+                )}
               </h2>
               <p className="muted">
-                {loginKind === "admin"
-                  ? "Use your approved admin email and password. Admin permissions are checked after sign-in."
-                  : "Use the email address invited by your business or carrier administrator."}
+                <span className="auth-desktop-copy">
+                  {loginKind === "admin"
+                    ? "Use your approved admin email and password. Admin permissions are checked after sign-in."
+                    : "Use the email address invited by your business or carrier administrator."}
+                </span>
+                <span className="auth-mobile-copy">
+                  {pendingUser
+                    ? "Choose a workspace to continue."
+                    : loginKind === "admin"
+                      ? "Use your admin email."
+                      : "Use your invited email."}
+                </span>
               </p>
             </>
           )}
@@ -982,8 +998,11 @@ export function AuthGate({ children }) {
                   </div>
 
                   <p className="auth-note">
-                    10 failed attempts lock sign-in for 24 hours. Limits are
-                    enforced by the server.
+                    10 failed attempts lock sign-in for 24 hours.
+                    <span className="auth-desktop-copy">
+                      {" "}
+                      Limits are enforced by the server.
+                    </span>
                   </p>
                 </form>
               )}
@@ -1086,13 +1105,23 @@ export function AuthGate({ children }) {
           )}
           {!configured && message && <p role="status">{message}</p>}
           <p className="auth-note">
-            No account? Ask your organization administrator for an invitation.
-            Workspace access requires an invitation.
+            <span className="auth-desktop-copy">
+              No account? Ask your organization administrator for an invitation.
+              Workspace access requires an invitation.
+            </span>
+            <span className="auth-mobile-copy">
+              Need access? Ask your administrator.
+            </span>
           </p>
           <p className="auth-note">
             <LockKey />
-            Sessions end after 15 minutes of inactivity. Signing in again is
-            required after a refresh.
+            <span className="auth-desktop-copy">
+              Sessions end after 15 minutes of inactivity. Signing in again is
+              required after a refresh.
+            </span>
+            <span className="auth-mobile-copy">
+              Sessions end after 15 minutes or a refresh.
+            </span>
           </p>
         </div>
       </section>

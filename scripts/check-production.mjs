@@ -87,7 +87,7 @@ try {
     });
     await page.goto(`http://127.0.0.1:${server.address().port}/shypit/`);
     await page
-      .getByRole("heading", { name: "Sign in to your workspace." })
+      .getByRole("heading", { name: /^Sign in(?: to your workspace)?\.$/ })
       .waitFor({ timeout: 10000 });
     assert.equal(
       await page.getByRole("navigation").count(),

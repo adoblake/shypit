@@ -1504,3 +1504,64 @@ footer .brand-lockup {
 .password-form #login-password {
   margin-bottom: 0;
 }
+
+/* Keep the phone sign-in focused on the task; desktop keeps the brand story. */
+.auth-mobile-copy {
+  display: none;
+}
+@media (max-width: 700px) {
+  .auth-desktop-copy {
+    display: none;
+  }
+  .auth-mobile-copy {
+    display: inline;
+  }
+  .auth-story {
+    padding: 16px 24px;
+    gap: 0;
+  }
+  .auth-story > div,
+  .auth-story::after {
+    display: none;
+  }
+  .auth-story .brand-lockup {
+    width: 160px;
+  }
+  .auth-form-panel {
+    padding: 24px 24px 32px;
+    align-items: flex-start;
+  }
+  .auth-form > .auth-lock,
+  .auth-form > .eyebrow {
+    display: none;
+  }
+  .auth-form h2 {
+    font-size: 30px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .auth-form > .muted {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+  .password-form .field-help {
+    margin-bottom: 12px;
+  }
+  .password-form .password-help {
+    margin-bottom: 8px;
+  }
+  .auth-form .primary {
+    margin-top: 12px;
+  }
+  .login-route {
+    margin-top: 8px;
+  }
+  .login-route .text-button {
+    margin-top: 0;
+  }
+  .auth-note {
+    margin-top: 18px;
+    line-height: 1.5;
+  }
+}
