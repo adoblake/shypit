@@ -1,3 +1,9 @@
+// Sample dates are relative to today so practice records never start out stale.
+export const sampleDate = (offsetDays) => {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 // Suggestions only: free text permits every US city, state, DC and territory.
 export const usLocations = [
   "Birmingham, AL",
@@ -62,8 +68,8 @@ export const nationalShipments = [
     id: "SHP-US-CT",
     from: "Hartford, CT",
     to: "Phoenix, AZ",
-    pickup: "2026-11-16",
-    delivery: "2026-11-20",
+    pickup: sampleDate(1),
+    delivery: sampleDate(5),
     pallets: 4,
     weight: 3200,
     equipment: "Box truck",
@@ -75,8 +81,8 @@ export const nationalShipments = [
     id: "SHP-US-NE",
     from: "New Haven, CT",
     to: "Boston, MA",
-    pickup: "2026-11-16",
-    delivery: "2026-11-17",
+    pickup: sampleDate(1),
+    delivery: sampleDate(2),
     pallets: 2,
     weight: 1600,
     equipment: "Box truck",
@@ -88,8 +94,8 @@ export const nationalShipments = [
     id: "SHP-US-MW",
     from: "Chicago, IL",
     to: "Dallas, TX",
-    pickup: "2026-11-16",
-    delivery: "2026-11-18",
+    pickup: sampleDate(1),
+    delivery: sampleDate(3),
     pallets: 12,
     weight: 9600,
     equipment: "Dry van",
@@ -101,8 +107,8 @@ export const nationalShipments = [
     id: "SHP-US-W",
     from: "Seattle, WA",
     to: "Miami, FL",
-    pickup: "2026-11-16",
-    delivery: "2026-11-23",
+    pickup: sampleDate(1),
+    delivery: sampleDate(8),
     pallets: 8,
     weight: 6400,
     equipment: "Dry van",
@@ -116,8 +122,8 @@ export const nationalLoads = [
     id: "LOAD-US-CT",
     from: "Hartford, CT",
     to: "Newark, NJ",
-    pickup: "2026-11-16",
-    delivery: "2026-11-17",
+    pickup: sampleDate(1),
+    delivery: sampleDate(2),
     pallets: 4,
     weight: 3200,
     equipment: "Box truck",
@@ -131,8 +137,8 @@ export const nationalLoads = [
     id: "LOAD-US-TX",
     from: "Dallas, TX",
     to: "Denver, CO",
-    pickup: "2026-11-16",
-    delivery: "2026-11-18",
+    pickup: sampleDate(1),
+    delivery: sampleDate(3),
     pallets: 6,
     weight: 4800,
     equipment: "Box truck",
@@ -152,7 +158,7 @@ export const connecticutPackage = {
   shipment: "",
   from: "Hartford, CT",
   to: "Phoenix, AZ",
-  eta: "2026-11-20",
+  eta: sampleDate(5),
   status: "Queued",
   events: [
     {
@@ -160,7 +166,7 @@ export const connecticutPackage = {
       status: "Queued",
       location: "Hartford, CT",
       note: "Sample package ready for pickup. Use Record a travel update to test each handoff.",
-      at: "2026-11-16T14:00:00Z",
+      at: sampleDate(0) + "T14:00:00Z",
     },
   ],
 };

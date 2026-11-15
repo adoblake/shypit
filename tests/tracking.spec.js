@@ -1,4 +1,5 @@
 import { installAuthMock, signIn } from "./fixtures/auth-mock.js";
+import { sampleDate } from "../src/nationwide.js";
 import { test, expect } from "@playwright/test";
 test("package intake, duplicates, travel history, company export and persistence", async ({
   page,
@@ -108,10 +109,11 @@ test("partner link supports Connecticut packages and nationwide freight", async 
   await page.getByRole("button", { name: "New shipment", exact: true }).click();
   await page.getByLabel("Pickup location").fill("Anchorage, AK");
   await page.getByLabel("Delivery location").fill("Honolulu, HI");
-  await page.getByLabel("Pickup date").fill("2026-11-20");
-  await page.getByLabel("Delivery date").fill("2026-11-28");
+  await page.getByLabel("Pickup date").fill(sampleDate(5));
+  await page.getByLabel("Delivery date").fill(sampleDate(13));
   await page.getByRole("button", { name: "Create shipment draft" }).click();
   await expect(page.locator("aside")).toContainText("Anchorage");
+  await expect(page.locator("aside")).toContainText("Carrier quote needed");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

@@ -92,9 +92,7 @@ function validData(d) {
   return (
     d &&
     Array.isArray(d.shipments) &&
-    d.shipments.length > 0 &&
     Array.isArray(d.loads) &&
-    d.loads.length > 0 &&
     Array.isArray(d.jobs) &&
     (!Object.hasOwn(d, "packages") || Array.isArray(d.packages))
   );
@@ -149,6 +147,7 @@ export function AuthGate({ children }) {
     queue = useRef(Promise.resolve()),
     revision = useRef(0),
     serverData = useRef(null),
+    pendingSaves = useRef(0),
     epoch = useRef(0),
     expires = useRef(0);
   useEffect(() => {
@@ -260,6 +259,7 @@ export function AuthGate({ children }) {
     setError("");
     setSaveState("");
     queue.current = Promise.resolve();
+    pendingSaves.current = 0;
   }
   async function signOut(reason = "You have been signed out.") {
     const access = token.current;
@@ -743,33 +743,67 @@ export function AuthGate({ children }) {
       )
       .finally(() => setBusy(false));
   }, [config]);
+  async function fetchWorkspace(workspaceId) {
+    const rows = await api(
+      "/rest/v1/workspaces?select=id,data,revision&id=eq." +
+        encodeURIComponent(workspaceId),
+    );
+    if (!rows || rows.length !== 1 || !validData(rows[0].data)) throw Error();
+    return rows[0];
+  }
   function update(field, updater) {
     const owner = accountRef.current;
     if (!owner || !["shipments", "jobs", "packages"].includes(field)) return;
-    const next =
-      typeof updater === "function" ? updater(data[field] ?? []) : updater;
-    setData((current) => ({ ...current, [field]: next }));
+    const apply = (list) =>
+      typeof updater === "function" ? updater(list ?? []) : updater;
+    // Optimistic local change, built on the latest local state (not a stale render).
+    setData((current) => ({ ...current, [field]: apply(current?.[field]) }));
     setSaveState("Saving…");
+    pendingSaves.current++;
     const requestEpoch = epoch.current;
     queue.current = queue.current
       .then(async () => {
+        // Each save applies its change to the last known server copy. If someone
+        // else saved in between (revision mismatch), reload and re-apply rather
+        // than discarding the user's work.
+        for (let attempt = 0; attempt < 3; attempt++) {
+          if (requestEpoch !== epoch.current) return;
+          const merged = {
+            ...serverData.current,
+            [field]: apply(serverData.current?.[field]),
+          };
+          const rows = await api(
+            "/rest/v1/workspaces?id=eq." +
+              encodeURIComponent(owner.workspace_id) +
+              "&revision=eq." +
+              revision.current,
+            { method: "PATCH", body: { data: merged } },
+          );
+          if (requestEpoch !== epoch.current) return;
+          if (rows && rows.length === 1) {
+            serverData.current = rows[0].data;
+            revision.current = rows[0].revision;
+            return;
+          }
+          const fresh = await fetchWorkspace(owner.workspace_id);
+          if (requestEpoch !== epoch.current) return;
+          serverData.current = fresh.data;
+          revision.current = fresh.revision;
+        }
+        throw Error("Save conflict");
+      })
+      .then(() => {
         if (requestEpoch !== epoch.current) return;
-        const merged = { ...serverData.current, [field]: next };
-        const rows = await api(
-          "/rest/v1/workspaces?id=eq." +
-            encodeURIComponent(owner.workspace_id) +
-            "&revision=eq." +
-            revision.current,
-          { method: "PATCH", body: { data: merged } },
-        );
-        if (requestEpoch !== epoch.current) return;
-        if (!rows || rows.length !== 1) throw Error();
-        serverData.current = rows[0].data;
-        revision.current = rows[0].revision;
-        setSaveState("Saved securely");
+        pendingSaves.current--;
+        if (pendingSaves.current === 0) {
+          // Nothing else queued: show the saved copy, including teammates' changes.
+          setData(serverData.current);
+          setSaveState("Saved securely");
+        }
       })
       .catch(() => {
         if (requestEpoch === epoch.current) {
+          pendingSaves.current = 0;
           signOut(
             "Your changes could not be saved. Sign in to reload the workspace before trying again.",
           );

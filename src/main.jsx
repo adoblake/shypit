@@ -2,7 +2,7 @@ import Marketplace from "./Marketplace";
 import BankingReturn, { hasBankingReturn } from "./BankingReturn";
 import Banking from "./Banking";
 import Brand from "./Brand";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Truck,
@@ -24,6 +24,7 @@ import { AuthGate, useWorkspaceField, SessionWarning } from "./auth";
 import "./styles.css";
 import Tracking from "./Tracking";
 import { usLocations, nationalShipments } from "./nationwide";
+import { estimateRoute, transitLabel, SERVICE_FEE } from "./pricing";
 
 const money = (n) =>
   new Intl.NumberFormat("en-US", {
@@ -37,7 +38,25 @@ const date = (d) =>
     day: "numeric",
   });
 const city = (s) => s.split(",")[0];
+// Local calendar date as YYYY-MM-DD, matching <input type="date"> values.
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+const pickupPassed = (s) => s.status === "Ready to book" && s.pickup < today();
+const newShipmentId = () =>
+  "SHP-" + crypto.randomUUID().replaceAll("-", "").slice(0, 8).toUpperCase();
+// Price for each service on a shipment that has not been booked yet. Routes that
+// can't be estimated (Alaska, Hawaii, territories, no state) need a carrier quote.
+const quoteFor = (shipment) => estimateRoute(shipment);
+const draftStatus = (s) =>
+  pickupPassed(s)
+    ? "Pickup date passed"
+    : s.status === "Ready to book" && !quoteFor(s)
+      ? "Quote needed"
+      : s.status;
 function Status({ value }) {
+  if (!value) return null;
   const Icon =
     value === "Delivered"
       ? CheckCircle
@@ -68,8 +87,7 @@ function Route({ item }) {
 function App({ account, initialData, initialPage }) {
   const role = account.role;
   const [listingSeed, setListingSeed] = useState(null);
-  const initialShipments = initialData.shipments;
-  const loads = initialData.loads;
+  const loads = initialData.loads ?? [];
   const [page, setPage] = useState(
       initialPage ||
         (role === "business"
@@ -82,8 +100,8 @@ function App({ account, initialData, initialPage }) {
     [shipments, setShipments] = useWorkspaceField("shipments"),
     [jobs, setJobs] = useWorkspaceField("jobs"),
     [packages, setPackages] = useWorkspaceField("packages"),
-    [selected, setSelected] = useState(initialShipments[0].id),
-    [selectedLoad, setSelectedLoad] = useState(loads[0].id),
+    [selected, setSelected] = useState(initialData.shipments?.[0]?.id),
+    [selectedLoad, setSelectedLoad] = useState(loads[0]?.id),
     [service, setService] = useState("Standard"),
     [modal, setModal] = useState(null),
     [notice, setNotice] = useState(""),
@@ -134,7 +152,20 @@ function App({ account, initialData, initialPage }) {
   }, [page]);
   const shipment = shipments.find((s) => s.id === selected) ?? shipments[0],
     load = loads.find((s) => s.id === selectedLoad) ?? loads[0];
-  const total = shipment.price + (service === "Priority" ? 175 : 0);
+  const quote = shipment ? quoteFor(shipment) : null;
+  const total = quote
+    ? service === "Priority"
+      ? quote.priority
+      : quote.standard
+    : null;
+  const recentRoutes = [];
+  for (const s of shipments) {
+    if (s.status === "Ready to book") continue;
+    const key = `${s.from}|${s.to}`;
+    if (!recentRoutes.some((r) => `${r.from}|${r.to}` === key))
+      recentRoutes.push(s);
+    if (recentRoutes.length === 3) break;
+  }
   const tabs =
     role === "business"
       ? ["Shipments", "Load board", "Package tracking", "Network", "Billing"]
@@ -149,11 +180,15 @@ function App({ account, initialData, initialPage }) {
         0,
       );
   };
+  const noticeTimer = useRef(null);
+  useEffect(() => () => clearTimeout(noticeTimer.current), []);
   const flash = (t) => {
+    clearTimeout(noticeTimer.current);
     setNotice(t);
-    setTimeout(() => setNotice(""), 5000);
+    noticeTimer.current = setTimeout(() => setNotice(""), 5000);
   };
   function book() {
+    if (total == null || pickupPassed(shipment)) return;
     setShipments((all) =>
       all.map((s) =>
         s.id === shipment.id
@@ -165,7 +200,7 @@ function App({ account, initialData, initialPage }) {
     flash("Shipment booked in demo. Awaiting carrier confirmation.");
   }
   function accept() {
-    if (jobs.some((j) => j.id === load.id)) return;
+    if (!load || jobs.some((j) => j.id === load.id)) return;
     setJobs((all) => [...all, { ...load, status: "Accepted", proof: "" }]);
     setModal(null);
     setPage("My jobs");
@@ -212,6 +247,7 @@ function App({ account, initialData, initialPage }) {
           {tabs.map((t) => (
             <button
               key={t}
+              aria-label={t}
               aria-current={
                 page === t || (page === "Practice loads" && t === "Find loads")
                   ? "page"
@@ -227,7 +263,14 @@ function App({ account, initialData, initialPage }) {
                 setPage(t);
               }}
             >
-              {t}
+              {t === "Package tracking" ? (
+                <>
+                  <span className="nav-full">{t}</span>
+                  <span className="nav-short">Tracking</span>
+                </>
+              ) : (
+                t
+              )}
             </button>
           ))}
         </nav>
@@ -279,8 +322,9 @@ function App({ account, initialData, initialPage }) {
                 <p className="eyebrow">YOUR SHIPPING WORKSPACE</p>
                 <h1>Keep your freight moving.</h1>
                 <p className="muted subtitle">
-                  Plan U.S. routes from Connecticut to the West Coast and
-                  beyond. All rates and carrier availability are illustrative.
+                  Plan freight between any U.S. locations. Rates are
+                  distance-based estimates; carrier availability is not
+                  confirmed.
                 </p>
               </div>
               <button className="small-button" onClick={() => setModal("new")}>
@@ -354,15 +398,22 @@ function App({ account, initialData, initialPage }) {
                     <Package size={20} />
                     {s.service}
                   </span>
-                  <Status value={s.status} />
+                  <Status value={draftStatus(s)} />
                 </button>
               ))}
+              {!shipments.length && (
+                <Empty
+                  title="No shipments yet"
+                  text="Create your first shipment to get a distance-based estimate."
+                  action={() => setModal("new")}
+                  label="New shipment"
+                />
+              )}
             </div>
-            <section className="recent">
-              <h2>Repeat a recent route</h2>
-              {initialShipments
-                .filter((s) => s.from.startsWith("Phoenix"))
-                .map((s) => (
+            {recentRoutes.length > 0 && (
+              <section className="recent">
+                <h2>Repeat a recent route</h2>
+                {recentRoutes.map((s) => (
                   <button
                     className="recent-row"
                     key={s.id}
@@ -380,109 +431,161 @@ function App({ account, initialData, initialPage }) {
                     </span>
                   </button>
                 ))}
-            </section>
+              </section>
+            )}
             <p className="footnote">
               <CheckCircle /> Your next shipment, without the back-and-forth.
             </p>
           </section>
           <aside className="details">
-            <p className="eyebrow">SHIPMENT DETAILS · {shipment.id}</p>
-            <h2>
-              {city(shipment.from)} to
-              <br />
-              {city(shipment.to)}
-            </h2>
-            <Route item={shipment} />
-            <div className="specs">
-              <span>
-                <Package />
-                {shipment.pallets} pallets
-              </span>
-              <span>{shipment.weight.toLocaleString()} lb</span>
-              <span>
-                <Truck />
-                {shipment.equipment}
-              </span>
-            </div>
-            {shipment.status === "Ready to book" ? (
+            {!shipment ? (
               <>
-                <h3>Select service</h3>
-                {["Standard", "Priority"].map((s) => (
-                  <label
-                    className={
-                      "service-option " + (service === s ? "chosen" : "")
-                    }
-                    key={s}
-                  >
-                    <input
-                      type="radio"
-                      name="service"
-                      value={s}
-                      checked={service === s}
-                      onChange={() => setService(s)}
-                    />
-                    <span>
-                      <strong>{s}</strong>
-                      <small>
-                        {s === "Standard"
-                          ? "Typical 1–2 day transit"
-                          : "Faster service, target next-day"}
-                      </small>
-                    </span>
-                    <span className="price">
-                      <strong>
-                        {money(shipment.price + (s === "Priority" ? 175 : 0))}
-                      </strong>
-                      <small>Illustrative</small>
-                    </span>
-                  </label>
-                ))}
-                <p className="helper">
-                  <Info />
-                  Freight and service fee included
+                <p className="eyebrow">SHIPMENT DETAILS</p>
+                <h2>Nothing selected</h2>
+                <p className="muted">
+                  Shipment details, estimates and booking appear here.
                 </p>
-                <button className="primary" onClick={() => setModal("review")}>
-                  Review & book <ArrowRight />
-                </button>
               </>
             ) : (
               <>
-                <h3>Shipment progress</h3>
-                <Status value={shipment.status} />
-                <ol className="timeline">
-                  <li>Shipment booked</li>
-                  <li>
-                    {shipment.status === "Awaiting carrier"
-                      ? "Waiting for carrier confirmation"
-                      : "Carrier assigned"}
-                  </li>
-                  <li>Pickup · {date(shipment.pickup)}</li>
-                  <li>Delivery · {date(shipment.delivery)}</li>
-                </ol>
-                <p className="helper">
-                  Tracking shown is sample data. Live location is not connected.
-                </p>
+                <p className="eyebrow">SHIPMENT DETAILS · {shipment.id}</p>
+                <h2>
+                  {city(shipment.from)} to
+                  <br />
+                  {city(shipment.to)}
+                </h2>
+                <Route item={shipment} />
+                <div className="specs">
+                  <span>
+                    <Package />
+                    {shipment.pallets} pallets
+                  </span>
+                  <span>{shipment.weight.toLocaleString()} lb</span>
+                  <span>
+                    <Truck />
+                    {shipment.equipment}
+                  </span>
+                </div>
+                {shipment.status === "Ready to book" &&
+                pickupPassed(shipment) ? (
+                  <>
+                    <h3>Pickup date has passed</h3>
+                    <p className="warning-note" role="note">
+                      This draft was planned for pickup on{" "}
+                      {date(shipment.pickup)}. Choose new dates before booking.
+                    </p>
+                    <button
+                      className="primary"
+                      onClick={() => setModal("reschedule")}
+                    >
+                      Choose new dates <ArrowRight />
+                    </button>
+                  </>
+                ) : shipment.status === "Ready to book" && !quote ? (
+                  <>
+                    <h3>Carrier quote needed</h3>
+                    <p className="warning-note" role="note">
+                      We can’t estimate this route automatically. Alaska,
+                      Hawaii, U.S. territories and locations without a state
+                      need a carrier quote. Post it to the load board to collect
+                      quotes.
+                    </p>
+                  </>
+                ) : shipment.status === "Ready to book" ? (
+                  <>
+                    <h3>Select service</h3>
+                    {["Standard", "Priority"].map((s) => (
+                      <label
+                        className={
+                          "service-option " + (service === s ? "chosen" : "")
+                        }
+                        key={s}
+                      >
+                        <input
+                          type="radio"
+                          name="service"
+                          value={s}
+                          checked={service === s}
+                          onChange={() => setService(s)}
+                        />
+                        <span>
+                          <strong>{s}</strong>
+                          <small>
+                            {s === "Standard"
+                              ? quote.standardDays
+                                ? transitLabel(quote.standardDays, false)
+                                : "Standard transit"
+                              : quote.priorityDays
+                                ? transitLabel(quote.priorityDays, true)
+                                : "Faster service"}
+                          </small>
+                        </span>
+                        <span className="price">
+                          <strong>
+                            {money(
+                              s === "Priority"
+                                ? quote.priority
+                                : quote.standard,
+                            )}
+                          </strong>
+                          <small>Estimate</small>
+                        </span>
+                      </label>
+                    ))}
+                    <p className="helper">
+                      <Info />
+                      {quote.miles
+                        ? `About ${quote.miles.toLocaleString()} road miles · freight and service fee included`
+                        : "Freight and service fee included"}
+                    </p>
+                    <button
+                      className="primary"
+                      onClick={() => setModal("review")}
+                    >
+                      Review & book <ArrowRight />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h3>Shipment progress</h3>
+                    <Status value={shipment.status} />
+                    <ol className="timeline">
+                      <li>Shipment booked</li>
+                      <li>
+                        {shipment.status === "Awaiting carrier"
+                          ? "Waiting for carrier confirmation"
+                          : "Carrier assigned"}
+                      </li>
+                      <li>Pickup · {date(shipment.pickup)}</li>
+                      <li>Delivery · {date(shipment.delivery)}</li>
+                    </ol>
+                    <p className="helper">
+                      Tracking shown is sample data. Live location is not
+                      connected.
+                    </p>
+                  </>
+                )}
+                <button
+                  className="small-button"
+                  onClick={() => {
+                    setListingSeed({ ...shipment });
+                    setPage("Load board");
+                  }}
+                >
+                  Post this shipment to load board
+                </button>
+                <div className="membership">
+                  <Buildings size={24} />
+                  <div>
+                    <strong>Business plan</strong>
+                    <p>
+                      Book freight, work with eligible carriers, and keep your
+                      team in the loop.
+                    </p>
+                  </div>
+                </div>
               </>
             )}
-            <button
-              className="small-button"
-              onClick={() => {
-                setListingSeed({ ...shipment });
-                setPage("Load board");
-              }}
-            >
-              Post this shipment to load board
-            </button>
-            <div className="membership">
-              <Buildings size={24} />
-              <div>
-                <strong>Business plan</strong>
-                <p>
-                  Book freight, work with eligible carriers, and keep your team
-                  in the loop.
-                </p>
-              </div>
-            </div>
           </aside>
         </main>
       ) : role === "driver" && page === "Practice loads" ? (
@@ -572,61 +675,74 @@ function App({ account, initialData, initialPage }) {
             </p>
           </section>
           <aside className="details">
-            <p className="eyebrow">LOAD DETAILS · {load.id}</p>
-            <h2>
-              {city(load.from)} to
-              <br />
-              {city(load.to)}
-            </h2>
-            <Route item={load} />
-            <div className="payout">
-              <small>Driver payout · illustrative</small>
-              <strong>{money(load.pay)}</strong>
-            </div>
-            <dl>
-              <div>
-                <dt>Pickup</dt>
-                <dd>
-                  {date(load.pickup)} · {load.window}
-                </dd>
-              </div>
-              <div>
-                <dt>Delivery</dt>
-                <dd>{date(load.delivery)}</dd>
-              </div>
-              <div>
-                <dt>Cargo</dt>
-                <dd>{load.cargo}</dd>
-              </div>
-              <div>
-                <dt>Equipment</dt>
-                <dd>
-                  {load.equipment} · {load.weight.toLocaleString()} lb
-                </dd>
-              </div>
-              <div>
-                <dt>Travel</dt>
-                <dd>
-                  {load.deadhead} empty + {load.miles} loaded miles
-                </dd>
-              </div>
-            </dl>
-            <p className="helper">
-              <Info />
-              Demo acceptance only. Live booking requires verified carrier
-              authority, insurance, and availability. Waiting-time terms must be
-              agreed before booking.
-            </p>
-            <button
-              className="primary"
-              disabled={jobs.some((j) => j.id === load.id)}
-              onClick={() => setModal("accept")}
-            >
-              {jobs.some((j) => j.id === load.id)
-                ? "Already accepted"
-                : "Review load"}
-              <ArrowRight />
-            </button>
+            {!load ? (
+              <>
+                <p className="eyebrow">LOAD DETAILS</p>
+                <h2>No practice loads</h2>
+                <p className="muted">
+                  This workspace has no sample loads. Use the member load board
+                  for real requests.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="eyebrow">LOAD DETAILS · {load.id}</p>
+                <h2>
+                  {city(load.from)} to
+                  <br />
+                  {city(load.to)}
+                </h2>
+                <Route item={load} />
+                <div className="payout">
+                  <small>Driver payout · illustrative</small>
+                  <strong>{money(load.pay)}</strong>
+                </div>
+                <dl>
+                  <div>
+                    <dt>Pickup</dt>
+                    <dd>
+                      {date(load.pickup)} · {load.window}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Delivery</dt>
+                    <dd>{date(load.delivery)}</dd>
+                  </div>
+                  <div>
+                    <dt>Cargo</dt>
+                    <dd>{load.cargo}</dd>
+                  </div>
+                  <div>
+                    <dt>Equipment</dt>
+                    <dd>
+                      {load.equipment} · {load.weight.toLocaleString()} lb
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Travel</dt>
+                    <dd>
+                      {load.deadhead} empty + {load.miles} loaded miles
+                    </dd>
+                  </div>
+                </dl>
+                <p className="helper">
+                  <Info />
+                  Demo acceptance only. Live booking requires verified carrier
+                  authority, insurance, and availability. Waiting-time terms
+                  must be agreed before booking.
+                </p>
+                <button
+                  className="primary"
+                  disabled={jobs.some((j) => j.id === load.id)}
+                  onClick={() => setModal("accept")}
+                >
+                  {jobs.some((j) => j.id === load.id)
+                    ? "Already accepted"
+                    : "Review load"}
+                  <ArrowRight />
+                </button>
+              </>
+            )}
           </aside>
         </main>
       ) : (
@@ -855,7 +971,25 @@ function App({ account, initialData, initialPage }) {
             >
               <X />
             </button>
-            {modal === "new" || modal === "repeat" ? (
+            {modal === "reschedule" ? (
+              <ShipmentForm
+                repeat={shipment}
+                reschedule
+                onCancel={() => setModal(null)}
+                onSave={(s) => {
+                  setShipments((all) =>
+                    all.map((x) =>
+                      x.id === shipment.id
+                        ? { ...x, ...s, id: x.id, service: x.service }
+                        : x,
+                    ),
+                  );
+                  setService("Standard");
+                  setModal(null);
+                  flash("Dates updated. Review the new estimate.");
+                }}
+              />
+            ) : modal === "new" || modal === "repeat" ? (
               <ShipmentForm
                 repeat={modal === "repeat" ? shipment : null}
                 onCancel={() => setModal(null)}
@@ -883,14 +1017,14 @@ function App({ account, initialData, initialPage }) {
                 </p>
                 <div className="ledger">
                   <span>Freight</span>
-                  <strong>{money(total - 45)}</strong>
+                  <strong>{money(total - SERVICE_FEE)}</strong>
                 </div>
                 <div className="ledger">
                   <span>Service fee</span>
-                  <strong>$45</strong>
+                  <strong>{money(SERVICE_FEE)}</strong>
                 </div>
                 <div className="ledger total">
-                  <span>Total · illustrative</span>
+                  <span>Total · estimate</span>
                   <strong>{money(total)}</strong>
                 </div>
                 <p className="helper">
@@ -943,8 +1077,9 @@ function Empty({ title, text, action, label }) {
     </div>
   );
 }
-function ShipmentForm({ repeat, onSave, onCancel }) {
+function ShipmentForm({ repeat, reschedule = false, onSave, onCancel }) {
   const [error, setError] = useState("");
+  const minDate = today();
   function submit(e) {
     e.preventDefault();
     const d = Object.fromEntries(new FormData(e.currentTarget));
@@ -952,31 +1087,44 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
       setError("Pickup and delivery must be different locations.");
       return;
     }
+    if (d.pickup < today()) {
+      setError("Pickup date can’t be in the past.");
+      return;
+    }
     if (d.delivery < d.pickup) {
       setError("Delivery must be on or after pickup.");
       return;
     }
-    onSave({
+    const shipment = {
       ...d,
       from: d.from.trim(),
       to: d.to.trim(),
       pallets: Number(d.pallets),
       weight: Number(d.weight),
-      id: "SHP-" + Date.now().toString().slice(-6),
+    };
+    const estimate = estimateRoute(shipment);
+    onSave({
+      ...shipment,
+      id: newShipmentId(),
       status: "Ready to book",
       service: "Standard",
-      price: 965,
+      price: estimate ? estimate.standard : null,
     });
   }
   return (
     <form onSubmit={submit}>
       <p className="eyebrow">LET’S GET IT MOVING</p>
-      <h2 id="modal-title">{repeat ? "Repeat a route" : "New shipment"}</h2>
+      <h2 id="modal-title">
+        {reschedule
+          ? "Choose new dates"
+          : repeat
+            ? "Repeat a route"
+            : "New shipment"}
+      </h2>
       <p className="helper">
-        Enter any U.S. city and state, DC, or territory. Suggestions are
-        optional. Demo quotes use a fixed sample rate; route pricing and carrier
-        availability are not connected. Alaska, Hawaii and territory service
-        requires carrier confirmation.
+        Enter a city and two-letter state (e.g. Hartford, CT). Estimates are
+        based on distance and pallet count; carrier availability is not
+        confirmed. Alaska, Hawaii and U.S. territories need a carrier quote.
       </p>
       <datalist id="us-shipment-locations">
         {usLocations.map((location) => (
@@ -1008,7 +1156,7 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
         </label>
         <label>
           Pickup date
-          <input required type="date" name="pickup" />
+          <input required type="date" name="pickup" min={minDate} />
         </label>
         <label>
           Delivery date
@@ -1053,7 +1201,7 @@ function ShipmentForm({ repeat, onSave, onCancel }) {
         </p>
       )}
       <button className="primary" type="submit">
-        Create shipment draft <ArrowRight />
+        {reschedule ? "Update dates" : "Create shipment draft"} <ArrowRight />
       </button>
       <button className="text-button" type="button" onClick={onCancel}>
         Cancel

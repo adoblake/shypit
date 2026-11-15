@@ -279,6 +279,23 @@ button {
 .status.awaiting-carrier {
   color: #7c601e;
 }
+.status.quote-needed {
+  color: #7c601e;
+}
+.status.pickup-date-passed {
+  color: #9a3520;
+}
+.warning-note {
+  background: #fff0e8;
+  color: #6e2715;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.nav-short {
+  display: none;
+}
 .recent {
   margin-top: 92px;
 }
@@ -786,14 +803,27 @@ dialog[open] {
   .topbar nav {
     order: 3;
     width: 100%;
-    gap: 0;
+    gap: 16px;
     justify-content: space-between;
-    overflow: auto;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .topbar nav::-webkit-scrollbar {
+    display: none;
   }
   .topbar nav button {
     font-size: 14px;
     min-height: 50px;
-    padding: 0 4px;
+    padding: 0 2px;
+    flex: none;
+    white-space: nowrap;
+  }
+  .nav-full {
+    display: none;
+  }
+  .nav-short {
+    display: inline;
   }
   .demo-bar {
     padding: 9px 20px;
@@ -1108,9 +1138,6 @@ dialog[open] {
   }
   .tms .heading-row {
     align-items: flex-start;
-    flex-wrap: wrap;
-  }
-  .topbar nav {
     flex-wrap: wrap;
   }
 }
@@ -1674,5 +1701,13 @@ body {
 @media (max-width: 760px) {
   .admin-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 420px) {
+  .topbar nav {
+    gap: 10px;
+  }
+  .topbar nav button {
+    font-size: 13px;
   }
 }

@@ -84,3 +84,7 @@ This remains a pilot data model: workspace JSON supports the existing demo journ
 ## Enable package tracking on an existing project
 
 If the original schema is already installed, run `supabase/packages-migration.sql` as the administrator before publishing the tracking module. Fresh projects use the updated `schema.sql` instead. The migration permits business members to update packages within their own workspace, validates the packages array, and keeps carrier members limited to job updates. It does not grant access to any new members. National sample loads are included when provisioning a new sample carrier workspace.
+
+## Allow empty workspaces on an existing project
+
+Projects created before this change require every workspace to contain at least one shipment and one load, so real workspaces had to carry sample data. Run `supabase/empty-workspace-migration.sql` as the administrator to remove that requirement. The app already handles empty shipment and load lists. Fresh projects use the updated `schema.sql` and need nothing extra.

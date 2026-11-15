@@ -9,8 +9,8 @@ create table public.workspaces (
  revision bigint not null default 0,
  constraint valid_workspace_data check (
   jsonb_typeof(data) = 'object' and data ?& array['shipments','loads','jobs'] and
-  jsonb_typeof(data->'shipments') = 'array' and jsonb_array_length(data->'shipments') > 0 and
-  jsonb_typeof(data->'loads') = 'array' and jsonb_array_length(data->'loads') > 0 and
+  jsonb_typeof(data->'shipments') = 'array' and
+  jsonb_typeof(data->'loads') = 'array' and
   jsonb_typeof(data->'jobs') = 'array' and (not (data ? 'packages') or jsonb_typeof(data->'packages') = 'array')
  )
 );

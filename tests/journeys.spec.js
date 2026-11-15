@@ -1,5 +1,7 @@
 import { installAuthMock, signIn } from "./fixtures/auth-mock.js";
 import { test, expect } from "@playwright/test";
+import { sampleDate } from "../src/nationwide.js";
+import { estimateRoute } from "../src/pricing.js";
 test("business creates a shipment, books and retains it", async ({ page }) => {
   const auth = await installAuthMock(page);
   await page.goto("/");
@@ -7,26 +9,35 @@ test("business creates a shipment, books and retains it", async ({ page }) => {
   await page.getByRole("button", { name: "New shipment", exact: true }).click();
   await page.getByLabel("Pickup location").fill("Tempe, AZ");
   await page.getByLabel("Delivery location").fill("San Diego, CA");
-  await page.getByLabel("Pickup date").fill("2026-11-16");
-  await page.getByLabel("Delivery date").fill("2026-11-15");
+  await page.getByLabel("Pickup date").fill(sampleDate(1));
+  await page.getByLabel("Delivery date").fill(sampleDate(0));
   await page.getByRole("button", { name: "Create shipment draft" }).click();
   await expect(page.getByRole("alert")).toContainText(
     "Delivery must be on or after pickup",
   );
-  await page.getByLabel("Delivery date").fill("2026-11-17");
+  await page.getByLabel("Delivery date").fill(sampleDate(2));
   await page.getByRole("button", { name: "Create shipment draft" }).click();
   await expect(page.locator("aside")).toContainText("Tempe");
   await page.getByRole("radio", { name: /Priority/ }).check();
   await page.getByRole("button", { name: "Review & book" }).click();
-  await expect(page.getByRole("dialog")).toContainText("$1,140");
+  const { priority } = estimateRoute({
+    from: "Tempe, AZ",
+    to: "San Diego, CA",
+    pallets: 8,
+  });
+  await expect(page.getByRole("dialog")).toContainText(
+    "$" + priority.toLocaleString("en-US"),
+  );
   await page.getByRole("button", { name: "Confirm demo booking" }).click();
   await expect(page.locator("aside")).toContainText("Awaiting carrier");
   await expect(page.getByText("Saved securely")).toBeVisible();
   await page.reload();
   await signIn(page);
   await expect(
-    page.getByRole("button").filter({ hasText: "Tempe" }),
+    page.locator(".shipment-row").filter({ hasText: "Tempe" }),
   ).toContainText("Awaiting carrier");
+  // A booked route becomes available to repeat.
+  await expect(page.locator(".recent")).toContainText("Tempe → San Diego");
 });
 test("driver filters, accepts and completes delivery with proof", async ({
   page,
