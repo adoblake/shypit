@@ -1,0 +1,10 @@
+{
+  "extraKnownMarketplaces": {
+    "studio": {
+      "source": { "source": "github", "repo": "adoblake/how-to-make-tasks" }
+    }
+  },
+  "enabledPlugins": {
+    "studio-kit@studio": true
+  }
+}
